@@ -52,6 +52,7 @@
 #include <chrono>
 #include <ncursesw/ncurses.h>
 #include <sstream>
+#include <cmath>
 
 using namespace std;
 
