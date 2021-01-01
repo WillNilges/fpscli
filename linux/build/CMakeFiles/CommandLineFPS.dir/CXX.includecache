@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/wilnil/fpscli/linux/CommandLineFPS.cpp
+iostream
+-
+vector
+-
+algorithm
+-
+chrono
+-
+ncursesw/ncurses.h
+-
+sstream
+-
+cmath
+-
+

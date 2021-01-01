@@ -1,0 +1,3 @@
+/home/wilnil/fpscli/linux/build/CMakeFiles/rebuild_cache.dir
+/home/wilnil/fpscli/linux/build/CMakeFiles/edit_cache.dir
+/home/wilnil/fpscli/linux/build/CMakeFiles/CommandLineFPS.dir
