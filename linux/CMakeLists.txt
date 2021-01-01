@@ -3,10 +3,12 @@ project(CommandLineFPS)               # Create project "CommandLineFPS"
 set(CMAKE_CXX_STANDARD 11)            # Enable c++11 standard
 
 # Include our FindNcursesw.cmake file
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_MODULE_PATH})
 
 # Find Ncursesw
-find_package( Ncursesw REQUIRED )
+find_package( PkgConfig REQUIRED )
+pkg_check_modules(CURSES ncurses REQUIRED)
+add_compile_definitions(NCURSES_WIDECHAR)
+
 include_directories( ${CURSES_INCLUDE_DIRS} )
 
 # Add CommandLineFPS.cpp file of project root directory as source file
