@@ -9,6 +9,7 @@
 ### Installation
 
 * Ubuntu: `sudo apt-get install cmake libncursesw5-dev`
+* Fedora: `sudo dnf -y install cmake ncurses-devel`
 * Other distros: `¯\_(ツ)_/¯`
 
 ## Build
