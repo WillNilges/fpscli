@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 11)            # Enable c++11 standard
 
 # Find Ncursesw
 find_package( PkgConfig REQUIRED )
-pkg_check_modules(CURSES ncurses REQUIRED)
+pkg_check_modules(CURSES ncursesw REQUIRED)
 add_compile_definitions(NCURSES_WIDECHAR)
 
 include_directories( ${CURSES_INCLUDE_DIRS} )
