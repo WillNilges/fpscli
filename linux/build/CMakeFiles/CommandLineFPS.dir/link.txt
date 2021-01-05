@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/CommandLineFPS.dir/CommandLineFPS.cpp.o -o CommandLineFPS  -lncursesw /usr/lib64/libform.so 
+/usr/bin/c++     CMakeFiles/CommandLineFPS.dir/CommandLineFPS.cpp.o  -o CommandLineFPS -lncursesw 

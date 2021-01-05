@@ -29,17 +29,23 @@ int main()
     curs_set(0);              // Don't show terminal cursor
     nodelay(stdscr, true);    // Don't halt program while waiting for input
     cbreak();                 // Make input characters immediately available to the program
+    start_color();
+
+    // Colors!
+	init_pair(1, COLOR_RED, COLOR_BLACK);
+    attron(COLOR_PAIR(1));
 
     // Create Screen Buffer
     auto *screen = new wchar_t[nScreenWidth * nScreenHeight];
 
     // Create Map of world space # = wall block, . = space
+    char validWalls[2] = { '#', '@' }; // Valid flavours of walls
     wstring map;
     map += L"#########........#.#.#.#";
     map += L"#................#.#.#.#";
-    map += L"#.......########.#.#.#.#";
-    map += L"#..............#.#.#.#.#";
-    map += L"#......##......#.#.#.#.#";
+    map += L"@.......########.#.#.#.#";
+    map += L"@..............#.#.#.#.#";
+    map += L"@......##......#.#.#.#.#";
     map += L"#......##......#.#.#.#.#";
     map += L"#..............#.#.#.#.#";
     map += L"###............#.......#";
@@ -65,7 +71,7 @@ int main()
 
     if (nMapWidth != nMapHeight) {
         endwin();
-        std::cout << "Ooooh, the world gets a bit funky when nMapWidth != nMapHeight. Correct that and try again." << endl;
+        std::cout << "The world gets a bit funky when nMapWidth != nMapHeight. Correct that and try again." << endl;
         return 1;
     }
 
@@ -153,6 +159,9 @@ int main()
             float fEyeX = sinf(fRayAngle); // Unit vector for ray in player space
             float fEyeY = cosf(fRayAngle);
 
+            // Work out what kind of block it is
+            char wallBlock;
+
             // Incrementally cast ray from player, along ray angle, testing for
             // intersection with a block
             while (!bHitWall && fDistanceToWall < fDepth)
@@ -169,8 +178,10 @@ int main()
                 }
                 else
                 {
-                    // Ray is inbounds so test to see if the ray cell is a wall block
-                    if (map.c_str()[nTestX * nMapWidth + nTestY] == '#')
+                    // Ray is inbounds so test to see if the ray cell is a wall block. TODO: Have some kind of array to search.
+                    wallBlock = map.c_str()[nTestX * nMapWidth + nTestY];
+                    char *isWall = std::find(std::begin(validWalls), std::end(validWalls), wallBlock);
+                    if (isWall != std::end(validWalls))
                     {
                         // Ray has hit wall
                         bHitWall = true;
@@ -210,24 +221,37 @@ int main()
             int nCeiling = (int)((float)(nScreenHeight/2.0) - nScreenHeight / ((float)fDistanceToWall));
             int nFloor = nScreenHeight - nCeiling;
 
-            // Shader walls based on distance
+            // Shader walls based on distance and material
             short nShade = ' ';
+            if (wallBlock == '#')
+            {
             if (fDistanceToWall <= fDepth / 4.0f)        nShade = 0x2588;    // Very close
             else if (fDistanceToWall < fDepth / 3.0f)    nShade = 0x2593;
             else if (fDistanceToWall < fDepth / 2.0f)    nShade = 0x2592;
             else if (fDistanceToWall < fDepth)           nShade = 0x2591;
             else                                         nShade = ' ';       // Too far away
+            }
+            else if (wallBlock == '@')
+            {
+                nShade = '@';
+            }
 
             if (bBoundary)
                 nShade = ' '; // Black it out
 
             for (int y = 0; y < nScreenHeight; y++)
             {
+            
+                //attron(COLOR_PAIR(1));
                 // Each Row
                 if(y <= nCeiling)
+                {
                     screen[y*nScreenWidth + x] = ' ';
+                }
                 else if(y > nCeiling && y <= nFloor)
+                {
                     screen[y*nScreenWidth + x] = nShade;
+                }
                 else // Floor
                 {
                     // Shade floor based on distance
@@ -239,6 +263,7 @@ int main()
                     else                 nShade = ' ';
                     screen[y*nScreenWidth + x] = nShade;
                 }
+                //attroff(COLOR_PAIR(1));
             }
         }
 
