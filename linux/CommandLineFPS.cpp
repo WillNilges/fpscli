@@ -29,42 +29,38 @@ int main()
     curs_set(0);              // Don't show terminal cursor
     nodelay(stdscr, true);    // Don't halt program while waiting for input
     cbreak();                 // Make input characters immediately available to the program
-    start_color();
-
-    // Colors!
-	init_pair(1, COLOR_RED, COLOR_BLACK);
-    attron(COLOR_PAIR(1));
 
     // Create Screen Buffer
     auto *screen = new wchar_t[nScreenWidth * nScreenHeight];
 
     // Create Map of world space # = wall block, . = space
     char validWalls[2] = { '#', '@' }; // Valid flavours of walls
+    // TODO: Valid collision walls, and valid VISUAL walls? :O
     wstring map;
-    map += L"#########........#.#.#.#";
+    map += L"#########........#.@@@.#";
     map += L"#................#.#.#.#";
-    map += L"@.......########.#.#.#.#";
-    map += L"@..............#.#.#.#.#";
-    map += L"@......##......#.#.#.#.#";
-    map += L"#......##......#.#.#.#.#";
-    map += L"#..............#.#.#.#.#";
+    map += L"@.......########.#.....#";
+    map += L"@..............#.#.....#";
+    map += L"@......##......#.#...#.#";
+    map += L"#......##......#.#...#.#";
+    map += L"#..............#.#...#.#";
     map += L"###............#.......#";
-    map += L"##.............#.#.#.#.#";
-    map += L"#......####..###.#.#.#.#";
-    map += L"#......#.......#.#.#.#.#";
-    map += L"#......#.......#.#.#.#.#";
-    map += L"#..............#.#.#.#.#";
+    map += L"##.............#.......#";
+    map += L"#......####..###.......#";
+    map += L"#......#.......#...@...#";
+    map += L"#......#.......#.......#";
+    map += L"#..............#.......#";
     map += L"#......#########........";
     map += L"#.......................";
-    map += L"################........";
-    map += L"################........";
-    map += L"################........";
-    map += L"################........";
-    map += L"################........";
-    map += L"################........";
-    map += L"################........";
-    map += L"################........";
-    map += L"################........";
+    map += L"##############.#........";
+    map += L"##############.#........";
+    map += L"##############.#........";
+    map += L"##############.#........";
+    map += L"##############.#........";
+    map += L"##############.#........";
+    map += L"##############.#........";
+    map += L"##############.#........";
+    map += L"############...#........";
 
     auto tp1 = chrono::system_clock::now();
     auto tp2 = chrono::system_clock::now();
@@ -108,7 +104,9 @@ int main()
             getmaxyx(stdscr, terminalHeight, terminalWidth);
         }
 
-        int key = getch();
+        int key = getch(); 
+        char collisionBlock;
+        char *wallCollision;
         switch (key) {
             case 'a':
                 // CCW Rotation
@@ -122,7 +120,10 @@ int main()
                 // Forward movement
                 fPlayerX += sinf(fPlayerA) * fSpeed * fElapsedTime;;
                 fPlayerY += cosf(fPlayerA) * fSpeed * fElapsedTime;;
-                if (map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY] == '#') {
+                //if (map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY] == '#') {
+                collisionBlock = map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY];
+                wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock); 
+                if (wallCollision != std::end(validWalls)) {
                     fPlayerX -= sinf(fPlayerA) * fSpeed * fElapsedTime;;
                     fPlayerY -= cosf(fPlayerA) * fSpeed * fElapsedTime;;
                 }
@@ -131,7 +132,10 @@ int main()
                 // Backward movement
                 fPlayerX -= sinf(fPlayerA) * fSpeed * fElapsedTime;;
                 fPlayerY -= cosf(fPlayerA) * fSpeed * fElapsedTime;;
-                if (map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY] == '#') {
+                //if (map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY] == '#') {
+                collisionBlock = map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY];
+                wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock); 
+                if (wallCollision != std::end(validWalls)) {
                     fPlayerX += sinf(fPlayerA) * fSpeed * fElapsedTime;;
                     fPlayerY += cosf(fPlayerA) * fSpeed * fElapsedTime;;
                 }
@@ -178,7 +182,7 @@ int main()
                 }
                 else
                 {
-                    // Ray is inbounds so test to see if the ray cell is a wall block. TODO: Have some kind of array to search.
+                    // Ray is inbounds so test to see if the ray cell is a wall block.
                     wallBlock = map.c_str()[nTestX * nMapWidth + nTestY];
                     char *isWall = std::find(std::begin(validWalls), std::end(validWalls), wallBlock);
                     if (isWall != std::end(validWalls))
@@ -222,27 +226,30 @@ int main()
             int nFloor = nScreenHeight - nCeiling;
 
             // Shader walls based on distance and material
+            // If you add a new block type, you must code in how you want it to be rendered.
             short nShade = ' ';
-            if (wallBlock == '#')
-            {
-            if (fDistanceToWall <= fDepth / 4.0f)        nShade = 0x2588;    // Very close
-            else if (fDistanceToWall < fDepth / 3.0f)    nShade = 0x2593;
-            else if (fDistanceToWall < fDepth / 2.0f)    nShade = 0x2592;
-            else if (fDistanceToWall < fDepth)           nShade = 0x2591;
-            else                                         nShade = ' ';       // Too far away
+            switch(wallBlock) {
+                case '#':
+                    if (fDistanceToWall <= fDepth / 4.0f)        nShade = 0x2588;    // Very close
+                    else if (fDistanceToWall < fDepth / 3.0f)    nShade = 0x2593;
+                    else if (fDistanceToWall < fDepth / 2.0f)    nShade = 0x2592;
+                    else if (fDistanceToWall < fDepth)           nShade = 0x2591;
+                    else                                         nShade = ' ';       // Too far away
+                    break;
+                case '@':
+                    nShade = '@';
+                    break;
+                default:
+                    nShade = ' ';
+                    break;
             }
-            else if (wallBlock == '@')
-            {
-                nShade = '@';
-            }
-
+            
             if (bBoundary)
                 nShade = ' '; // Black it out
 
             for (int y = 0; y < nScreenHeight; y++)
             {
             
-                //attron(COLOR_PAIR(1));
                 // Each Row
                 if(y <= nCeiling)
                 {
@@ -263,7 +270,6 @@ int main()
                     else                 nShade = ' ';
                     screen[y*nScreenWidth + x] = nShade;
                 }
-                //attroff(COLOR_PAIR(1));
             }
         }
 
