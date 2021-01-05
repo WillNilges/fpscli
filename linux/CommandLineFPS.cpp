@@ -1,51 +1,3 @@
-/*
-    OneLoneCoder.com - Command Line First Person Shooter (FPS) Engine
-    "Why were games not done like this is 1990?" - @Javidx9
-    Disclaimer
-    ~~~~~~~~~~
-    I don't care what you use this for. It's intended to be educational, and perhaps
-    to the oddly minded - a little bit of fun. Please hack this, change it and use it
-    in any way you see fit. BUT, you acknowledge that I am not responsible for anything
-    bad that happens as a result of your actions. However, if good stuff happens, I
-    would appreciate a shout out, or at least give the blog some publicity for me.
-    Cheers!
-    Background
-    ~~~~~~~~~~
-    Whilst waiting for TheMexicanRunner to start the finale of his NesMania project,
-    his Twitch stream had a counter counting down for a couple of hours until it started.
-    With some time on my hands, I thought it might be fun to see what the graphical
-    capabilities of the console are. Turns out, not very much, but hey, it's nice to think
-    Wolfenstein could have existed a few years earlier, and in just ~200 lines of code.
-    IMPORTANT!!!!
-    ~~~~~~~~~~~~~
-    READ ME BEFORE RUNNING!!! This program expects the console dimensions to be set to
-    120 Columns by 40 Rows. I recommend a small font "Consolas" at size 16. You can do this
-    by running the program, and right clicking on the console title bar, and specifying
-    the properties. You can also choose to default to them in the future.
-
-    Controls: A = Turn Left, D = Turn Right, W = Walk Forwards, S = Walk Backwards
-    Future Modifications
-    ~~~~~~~~~~~~~~~~~~~~
-    1) Shade block segments based on angle from player, i.e. less light reflected off
-    walls at side of player. Walls straight on are brightest.
-    2) Find an interesting and optimised ray-tracing method. I'm sure one must exist
-    to more optimally search the map space
-    3) Add bullets!
-    4) Add bad guys!
-    Author
-    ~~~~~~
-    Twitter: @javidx9
-    Blog: www.onelonecoder.com
-    Linux Port
-    ~~~~~~~~~~
-    Author: Rohan Liston
-    GitHub: github.com/rohanliston
-    Video:
-    ~~~~~~
-    https://youtu.be/xW8skO7MFYw
-    Last Updated: 27/02/2017
-*/
-
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -58,8 +10,8 @@ using namespace std;
 
 int nScreenWidth = 120;       // Console Screen Size X (columns)
 int nScreenHeight = 40;       // Console Screen Size Y (rows)
-int nMapWidth = 16;           // World Dimensions
-int nMapHeight = 16;
+int nMapWidth = 24;           // World Dimensions
+int nMapHeight = 24;
 
 float fPlayerX = 14.7f;       // Player Start Position
 float fPlayerY = 5.09f;
@@ -82,26 +34,42 @@ int main()
     auto *screen = new wchar_t[nScreenWidth * nScreenHeight];
 
     // Create Map of world space # = wall block, . = space
+    char validWalls[2] = { '#', '@' }; // Valid flavours of walls
+    // TODO: Valid collision walls, and valid VISUAL walls? :O
     wstring map;
-    map += L"#########.......";
-    map += L"#...............";
-    map += L"#.......########";
-    map += L"#..............#";
-    map += L"#......##......#";
-    map += L"#......##......#";
-    map += L"#..............#";
-    map += L"###............#";
-    map += L"##.............#";
-    map += L"#......####..###";
-    map += L"#......#.......#";
-    map += L"#......#.......#";
-    map += L"#..............#";
-    map += L"#......#########";
-    map += L"#..............#";
-    map += L"################";
+    map += L"#########........#.@@@.#";
+    map += L"#................#.#.#.#";
+    map += L"@.......########.#.....#";
+    map += L"@..............#.#.....#";
+    map += L"@......##......#.#...#.#";
+    map += L"#......##......#.#...#.#";
+    map += L"#..............#.#...#.#";
+    map += L"###............#.......#";
+    map += L"##.............#.......#";
+    map += L"#......####..###.......#";
+    map += L"#......#.......#...@...#";
+    map += L"#......#.......#.......#";
+    map += L"#..............#.......#";
+    map += L"#......#########........";
+    map += L"#.......................";
+    map += L"##############.#........";
+    map += L"##############.#........";
+    map += L"##############.#........";
+    map += L"##############.#........";
+    map += L"##############.#........";
+    map += L"##############.#........";
+    map += L"##############.#........";
+    map += L"##############.#........";
+    map += L"############...#........";
 
     auto tp1 = chrono::system_clock::now();
     auto tp2 = chrono::system_clock::now();
+
+    if (nMapWidth != nMapHeight) {
+        endwin();
+        std::cout << "The world gets a bit funky when nMapWidth != nMapHeight. Correct that and try again." << endl;
+        return 1;
+    }
 
     bool finished = false;
     while (!finished)
@@ -136,7 +104,9 @@ int main()
             getmaxyx(stdscr, terminalHeight, terminalWidth);
         }
 
-        int key = getch();
+        int key = getch(); 
+        char collisionBlock;
+        char *wallCollision;
         switch (key) {
             case 'a':
                 // CCW Rotation
@@ -150,7 +120,10 @@ int main()
                 // Forward movement
                 fPlayerX += sinf(fPlayerA) * fSpeed * fElapsedTime;;
                 fPlayerY += cosf(fPlayerA) * fSpeed * fElapsedTime;;
-                if (map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY] == '#') {
+                //if (map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY] == '#') {
+                collisionBlock = map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY];
+                wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock); 
+                if (wallCollision != std::end(validWalls)) {
                     fPlayerX -= sinf(fPlayerA) * fSpeed * fElapsedTime;;
                     fPlayerY -= cosf(fPlayerA) * fSpeed * fElapsedTime;;
                 }
@@ -159,7 +132,10 @@ int main()
                 // Backward movement
                 fPlayerX -= sinf(fPlayerA) * fSpeed * fElapsedTime;;
                 fPlayerY -= cosf(fPlayerA) * fSpeed * fElapsedTime;;
-                if (map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY] == '#') {
+                //if (map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY] == '#') {
+                collisionBlock = map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY];
+                wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock); 
+                if (wallCollision != std::end(validWalls)) {
                     fPlayerX += sinf(fPlayerA) * fSpeed * fElapsedTime;;
                     fPlayerY += cosf(fPlayerA) * fSpeed * fElapsedTime;;
                 }
@@ -187,6 +163,9 @@ int main()
             float fEyeX = sinf(fRayAngle); // Unit vector for ray in player space
             float fEyeY = cosf(fRayAngle);
 
+            // Work out what kind of block it is
+            char wallBlock;
+
             // Incrementally cast ray from player, along ray angle, testing for
             // intersection with a block
             while (!bHitWall && fDistanceToWall < fDepth)
@@ -203,8 +182,10 @@ int main()
                 }
                 else
                 {
-                    // Ray is inbounds so test to see if the ray cell is a wall block
-                    if (map.c_str()[nTestX * nMapWidth + nTestY] == '#')
+                    // Ray is inbounds so test to see if the ray cell is a wall block.
+                    wallBlock = map.c_str()[nTestX * nMapWidth + nTestY];
+                    char *isWall = std::find(std::begin(validWalls), std::end(validWalls), wallBlock);
+                    if (isWall != std::end(validWalls))
                     {
                         // Ray has hit wall
                         bHitWall = true;
@@ -244,24 +225,40 @@ int main()
             int nCeiling = (int)((float)(nScreenHeight/2.0) - nScreenHeight / ((float)fDistanceToWall));
             int nFloor = nScreenHeight - nCeiling;
 
-            // Shader walls based on distance
+            // Shader walls based on distance and material
+            // If you add a new block type, you must code in how you want it to be rendered.
             short nShade = ' ';
-            if (fDistanceToWall <= fDepth / 4.0f)        nShade = 0x2588;    // Very close
-            else if (fDistanceToWall < fDepth / 3.0f)    nShade = 0x2593;
-            else if (fDistanceToWall < fDepth / 2.0f)    nShade = 0x2592;
-            else if (fDistanceToWall < fDepth)           nShade = 0x2591;
-            else                                         nShade = ' ';       // Too far away
-
+            switch(wallBlock) {
+                case '#':
+                    if (fDistanceToWall <= fDepth / 4.0f)        nShade = 0x2588;    // Very close
+                    else if (fDistanceToWall < fDepth / 3.0f)    nShade = 0x2593;
+                    else if (fDistanceToWall < fDepth / 2.0f)    nShade = 0x2592;
+                    else if (fDistanceToWall < fDepth)           nShade = 0x2591;
+                    else                                         nShade = ' ';       // Too far away
+                    break;
+                case '@':
+                    nShade = '@';
+                    break;
+                default:
+                    nShade = ' ';
+                    break;
+            }
+            
             if (bBoundary)
                 nShade = ' '; // Black it out
 
             for (int y = 0; y < nScreenHeight; y++)
             {
+            
                 // Each Row
                 if(y <= nCeiling)
+                {
                     screen[y*nScreenWidth + x] = ' ';
+                }
                 else if(y > nCeiling && y <= nFloor)
+                {
                     screen[y*nScreenWidth + x] = nShade;
+                }
                 else // Floor
                 {
                     // Shade floor based on distance
