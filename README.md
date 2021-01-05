@@ -1,6 +1,6 @@
-# CommandLineFPS
+# fpscli
 
-A First Person Shooter at the command line? Yup...
+A rough approximation of a First Person Shooter, done on the command line.
 
 Please see the source file on how to configure your command line before running.
 
