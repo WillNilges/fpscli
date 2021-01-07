@@ -20,6 +20,8 @@ float fFOV = 3.14159f / 4.0f; // Field of View
 float fDepth = 16.0f;         // Maximum rendering distance
 float fSpeed = 150.0f;        // Walking Speed
 
+char validWalls[5] = { 'W', 'R', 'G', 'B', 'Y' }; // Valid, collidable walls.
+
 int main()
 {
     // NCurses setup
@@ -38,14 +40,7 @@ int main()
     init_pair(4, COLOR_BLUE, COLOR_BLACK);   // 'B'
     init_pair(5, COLOR_YELLOW, COLOR_BLACK); // 'Y'
 
-
-    // Create Screen Buffer
-    auto *screen = new wchar_t[nScreenWidth * nScreenHeight];
-
-    // Create Map of world space # = wall block, . = space
-    char validWalls[5] = { 'W', 'R', 'G', 'B', 'Y' }; // Valid flavours of walls
-    // TODO: Valid collision walls, and valid VISUAL walls? :O
-    wstring map;
+    wstring map; // THE WOLRD ARRAY
     map += L"WWWWWWWWWWWWWWWWWW.RRR.W";
     map += L"W................W.W.W.W";
     map += L"R.......WWWWWWWW.W.....W";
@@ -114,9 +109,14 @@ int main()
             getmaxyx(stdscr, terminalHeight, terminalWidth);
         }
 
+
+        // Player movement and world collision detection
         int key = getch(); 
-        char collisionBlock;
-        char *wallCollision;
+        
+        // Increments of movement, depending on the player's actions.
+        float fXMovement = 0.0f;
+        float fYMovement = 0.0f;
+
         switch (key) {
             case 'k':
                 // CCW Rotation
@@ -128,47 +128,23 @@ int main()
                 break;
             case 'a':
                 // Left movement
-                fPlayerX += sinf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
-                fPlayerY += cosf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
-                collisionBlock = map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY];
-                wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock); 
-                if (wallCollision != std::end(validWalls)) {
-                    fPlayerX -= sinf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
-                    fPlayerY -= cosf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
-                }
+                fXMovement += sinf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
+                fYMovement += cosf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
                 break;
             case 'd':
                 // Right movement
-                fPlayerX += sinf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
-                fPlayerY += cosf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
-                collisionBlock = map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY];
-                wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock); 
-                if (wallCollision != std::end(validWalls)) {
-                    fPlayerX -= sinf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
-                    fPlayerY -= cosf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
-                }
+                fXMovement += sinf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
+                fYMovement += cosf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
                 break;
             case 'w':
                 // Forward movement
-                fPlayerX += sinf(fPlayerA) * fSpeed * fElapsedTime;;
-                fPlayerY += cosf(fPlayerA) * fSpeed * fElapsedTime;;
-                collisionBlock = map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY];
-                wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock); 
-                if (wallCollision != std::end(validWalls)) {
-                    fPlayerX -= sinf(fPlayerA) * fSpeed * fElapsedTime;;
-                    fPlayerY -= cosf(fPlayerA) * fSpeed * fElapsedTime;;
-                }
+                fXMovement += sinf(fPlayerA) * fSpeed * fElapsedTime;;
+                fYMovement += cosf(fPlayerA) * fSpeed * fElapsedTime;;
                 break;
             case 's':
                 // Backward movement
-                fPlayerX -= sinf(fPlayerA) * fSpeed * fElapsedTime;;
-                fPlayerY -= cosf(fPlayerA) * fSpeed * fElapsedTime;;
-                collisionBlock = map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY];
-                wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock); 
-                if (wallCollision != std::end(validWalls)) {
-                    fPlayerX += sinf(fPlayerA) * fSpeed * fElapsedTime;;
-                    fPlayerY += cosf(fPlayerA) * fSpeed * fElapsedTime;;
-                }
+                fXMovement -= sinf(fPlayerA) * fSpeed * fElapsedTime;;
+                fYMovement -= cosf(fPlayerA) * fSpeed * fElapsedTime;;
                 break;
             case 'q':
                 // Quit
@@ -179,6 +155,25 @@ int main()
                 break;
             default:
                 break;
+        }
+
+        if (fXMovement != 0.0f || fYMovement != 0.0f)
+        {
+            // What block the player hits, acquired by checking their
+            // rounded position with an index in the world array.
+            char collisionBlock = map.c_str()[
+                    (int) (fPlayerX+fXMovement) * nMapWidth + (int) (fPlayerY+fYMovement)
+                ];
+            
+            // The char in the world array that the player hit (could be empty)
+            char *wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock); 
+            
+            // If the block we're about to hit isn't a wall, then allow the player to move.
+            if (wallCollision == std::end(validWalls))
+            {
+                fPlayerX += fXMovement;
+                fPlayerY += fYMovement;
+            }
         }
 
         for (int x = 0; x < nScreenWidth; x++)
@@ -262,10 +257,10 @@ int main()
             // If you add a new block type, you must code in how you want it to be rendered.
             short nShade = ' ';
             if (fDistanceToWall <= fDepth / 4.0f)        nShade = 0x2588;    // Very close
-                    else if (fDistanceToWall < fDepth / 3.0f)    nShade = 0x2593;
-                    else if (fDistanceToWall < fDepth / 2.0f)    nShade = 0x2592;
-                    else if (fDistanceToWall < fDepth)           nShade = 0x2591;
-                    else                                         nShade = ' ';       // Too far away
+            else if (fDistanceToWall < fDepth / 3.0f)    nShade = 0x2593;
+            else if (fDistanceToWall < fDepth / 2.0f)    nShade = 0x2592;
+            else if (fDistanceToWall < fDepth)           nShade = 0x2591;
+            else                                         nShade = ' ';       // Too far away
 
             // Decide which color to use for the wall, should it exist.
             int color = 1;
@@ -298,12 +293,10 @@ int main()
                 // Each Section of the world
                 if(y <= nCeiling) // Ceiling
                 {
-                    screen[y*nScreenWidth + x] = ' ';
                     mvaddch(y, x, ' ');
                 }
                 else if(y > nCeiling && y <= nFloor) // Walls
                 {
-                    screen[y*nScreenWidth + x] = nShade;
                     attron(COLOR_PAIR(color));
                     wchar_t wstr[] = { nShade, L'\0' };
                     mvaddwstr(y, x, wstr);
@@ -319,7 +312,6 @@ int main()
                     else if (b < 0.75)   nShade = '.';
                     else if (b < 0.9)    nShade = '-';
                     else                 nShade = ' ';
-                    screen[y*nScreenWidth + x] = nShade; // TODO: Decide if this buffer is still necessary.
                     mvaddch(y, x, nShade);
                 }
             }
