@@ -30,14 +30,21 @@ int main()
     nodelay(stdscr, true);    // Don't halt program while waiting for input
     cbreak();                 // Make input characters immediately available to the program
 
+    // Colors!
+    start_color();
+    init_pair(1, COLOR_WHITE, COLOR_BLACK); // 'W'
+    init_pair(2, COLOR_RED, COLOR_BLACK);   // 'R'
+    init_pair(3, COLOR_GREEN, COLOR_BLACK); // 'G'
+
+
     // Create Screen Buffer
     auto *screen = new wchar_t[nScreenWidth * nScreenHeight];
 
     // Create Map of world space # = wall block, . = space
-    char validWalls[2] = { '#', '@' }; // Valid flavours of walls
+    char validWalls[3] = { '#', '@', '/'}; // Valid flavours of walls
     // TODO: Valid collision walls, and valid VISUAL walls? :O
     wstring map;
-    map += L"#########........#.@@@.#";
+    map += L"##################.@@@.#";
     map += L"#................#.#.#.#";
     map += L"@.......########.#.....#";
     map += L"@..............#.#.....#";
@@ -50,17 +57,17 @@ int main()
     map += L"#......#.......#...@...#";
     map += L"#......#.......#.......#";
     map += L"#..............#.......#";
-    map += L"#......#########........";
-    map += L"#.......................";
-    map += L"##############.#........";
-    map += L"##############.#........";
-    map += L"##############.#........";
-    map += L"##############.#........";
-    map += L"##############.#........";
-    map += L"##############.#........";
-    map += L"##############.#........";
-    map += L"##############.#........";
-    map += L"############...#........";
+    map += L"#......#########.......#";
+    map += L"#......................#";
+    map += L"#..............#.......#";
+    map += L"#..............#.......#";
+    map += L"#............../.......#";
+    map += L"#......#......./.......#";
+    map += L"#..............#.......#";
+    map += L"#......##......#.......#";
+    map += L"#......##......#.......#";
+    map += L"#..............#.......#";
+    map += L"############@@##########";
 
     auto tp1 = chrono::system_clock::now();
     auto tp2 = chrono::system_clock::now();
@@ -132,7 +139,6 @@ int main()
                 // Backward movement
                 fPlayerX -= sinf(fPlayerA) * fSpeed * fElapsedTime;;
                 fPlayerY -= cosf(fPlayerA) * fSpeed * fElapsedTime;;
-                //if (map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY] == '#') {
                 collisionBlock = map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY];
                 wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock); 
                 if (wallCollision != std::end(validWalls)) {
@@ -228,19 +234,24 @@ int main()
             // Shader walls based on distance and material
             // If you add a new block type, you must code in how you want it to be rendered.
             short nShade = ' ';
-            switch(wallBlock) {
-                case '#':
-                    if (fDistanceToWall <= fDepth / 4.0f)        nShade = 0x2588;    // Very close
+            if (fDistanceToWall <= fDepth / 4.0f)        nShade = 0x2588;    // Very close
                     else if (fDistanceToWall < fDepth / 3.0f)    nShade = 0x2593;
                     else if (fDistanceToWall < fDepth / 2.0f)    nShade = 0x2592;
                     else if (fDistanceToWall < fDepth)           nShade = 0x2591;
                     else                                         nShade = ' ';       // Too far away
+
+            int color = 1;
+            switch(wallBlock) {
+                case '#':
                     break;
                 case '@':
-                    nShade = '@';
+                    color = 2;
+                    break;
+                case '/':
+                    color = 3;
                     break;
                 default:
-                    nShade = ' ';
+                    color = 1;
                     break;
             }
             
@@ -250,14 +261,20 @@ int main()
             for (int y = 0; y < nScreenHeight; y++)
             {
             
-                // Each Row
-                if(y <= nCeiling)
+                // Each Section of the world
+                if(y <= nCeiling) // Ceiling
                 {
                     screen[y*nScreenWidth + x] = ' ';
+                    mvaddch(y, x, ' ');
                 }
-                else if(y > nCeiling && y <= nFloor)
+                else if(y > nCeiling && y <= nFloor) // Walls
                 {
                     screen[y*nScreenWidth + x] = nShade;
+                    attron(COLOR_PAIR(color));
+                    wchar_t wstr[] = { nShade, L'\0' };
+                    mvaddwstr(y, x, wstr);
+                    attroff(COLOR_PAIR(color));
+                    
                 }
                 else // Floor
                 {
@@ -268,13 +285,38 @@ int main()
                     else if (b < 0.75)   nShade = '.';
                     else if (b < 0.9)    nShade = '-';
                     else                 nShade = ' ';
-                    screen[y*nScreenWidth + x] = nShade;
+                    // screen[y*nScreenWidth + x] = nShade;
+                    mvaddch(y, x, nShade);
                 }
             }
         }
 
         // Display Frame
-        mvaddwstr(0, 0, screen);
+        // mvaddwstr(0, 0, screen);
+
+        // for (int i = 0; i < (nScreenWidth * nScreenHeight); i++) {
+        //     addch(screen[i]);
+        // }
+
+        // for (int y = 0; y < nScreenHeight; y++) {
+        //     for (int x = 0; x < nScreenWidth; x++) {
+        //         int color = 0;
+        //         switch (screen[0]) {
+        //             case 'W':
+        //                 color = 1;
+        //                 break;
+        //             case 'R':
+        //                 color = 2;
+        //                 break;
+        //             default:
+        //                 color = 1;
+        //                 break;
+        //         }
+        //         attron(COLOR_PAIR(color));
+        //         mvaddch(screen[0], x, y);
+        //         attroff(COLOR_PAIR(color));
+        //     }
+        // }
 
         // Display Stats
         wchar_t stats[40];
