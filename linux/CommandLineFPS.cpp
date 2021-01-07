@@ -318,6 +318,12 @@ int main()
             // Display Player
             mvaddch((int)fPlayerX+1, ((int)fPlayerY), 'P');
         }
+
+        // Display instructions
+        wchar_t instructions[40] = L"wsad=Move, kl=look, q=quit, h=HUD";
+        attron(A_BOLD);
+        mvaddwstr(nScreenHeight-1,0, instructions);
+        attroff(A_BOLD);
         
         // Draw screen
         refresh();
