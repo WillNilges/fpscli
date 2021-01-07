@@ -81,6 +81,7 @@ int main()
     }
 
     bool finished = false;
+    bool showHUD = false;
     while (!finished)
     {
         // We'll need time differential per frame to calculate modification
@@ -117,19 +118,40 @@ int main()
         char collisionBlock;
         char *wallCollision;
         switch (key) {
-            case 'a':
+            case 'k':
                 // CCW Rotation
                 fPlayerA -= (fSpeed * 0.75f) * fElapsedTime;
                 break;
-            case 'd':
+            case 'l':
                 // CW Rotation
                 fPlayerA += (fSpeed * 0.75f) * fElapsedTime;
+                break;
+            case 'a':
+                // Left movement
+                fPlayerX += sinf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
+                fPlayerY += cosf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
+                collisionBlock = map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY];
+                wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock); 
+                if (wallCollision != std::end(validWalls)) {
+                    fPlayerX -= sinf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
+                    fPlayerY -= cosf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
+                }
+                break;
+            case 'd':
+                // Right movement
+                fPlayerX += sinf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
+                fPlayerY += cosf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
+                collisionBlock = map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY];
+                wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock); 
+                if (wallCollision != std::end(validWalls)) {
+                    fPlayerX -= sinf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
+                    fPlayerY -= cosf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
+                }
                 break;
             case 'w':
                 // Forward movement
                 fPlayerX += sinf(fPlayerA) * fSpeed * fElapsedTime;;
                 fPlayerY += cosf(fPlayerA) * fSpeed * fElapsedTime;;
-                //if (map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY] == '#') {
                 collisionBlock = map.c_str()[(int) fPlayerX * nMapWidth + (int) fPlayerY];
                 wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock); 
                 if (wallCollision != std::end(validWalls)) {
@@ -151,6 +173,9 @@ int main()
             case 'q':
                 // Quit
                 finished = true;
+                break;
+            case 'h':
+                showHUD = !showHUD;
                 break;
             default:
                 break;
@@ -303,23 +328,31 @@ int main()
         // Display Frame
         // mvaddwstr(0, 0, screen);
 
-        // Display Stats
-        wchar_t stats[40];
-        swprintf(stats, 40, L"X=%3.2f, Y=%3.2f, A=%3.2f FPS=%3.2f ", fPlayerX, fPlayerY, fPlayerA, 1.0f/fElapsedTime);
-        mvaddwstr(0, 0, stats);
+        if (showHUD) {
+            // Display Stats
+            wchar_t stats[40];
+            swprintf(stats, 40, L"X=%3.2f, Y=%3.2f, A=%3.2f FPS=%3.2f ", fPlayerX, fPlayerY, fPlayerA, 1.0f/fElapsedTime);
+            mvaddwstr(0, 0, stats);
 
-        // Display Map
-        for (int nx = 0; nx < nMapWidth; nx++)
-        {
-            for (int ny = 0; ny < nMapWidth; ny++)
+            // Display Map
+            for (int nx = 0; nx < nMapWidth; nx++)
             {
-                mvaddch(ny+1, nx, (chtype)map[ny * nMapWidth + nx]);
+                for (int ny = 0; ny < nMapWidth; ny++)
+                {
+                    mvaddch(ny+1, nx, (chtype)map[ny * nMapWidth + nx]);
+                }
             }
+
+            // Display Player
+            mvaddch((int)fPlayerX+1, ((int)fPlayerY), 'P');
         }
 
-        // Display Player
-        mvaddch((int)fPlayerX+1, ((int)fPlayerY), 'P');
-
+        // Display instructions
+        wchar_t instructions[40] = L"wsad=Move, kl=look, q=quit, h=HUD";
+        attron(A_BOLD);
+        mvaddwstr(nScreenHeight-1,0, instructions);
+        attroff(A_BOLD);
+        
         // Draw screen
         refresh();
     }
