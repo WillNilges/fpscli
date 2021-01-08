@@ -1,15 +1,28 @@
-# fpscli
+# CommandLineFPS - Linux Version
 
-A rough approximation of a First Person Shooter, done on the command line.
+![Screenshot](screenshot.png)
+## Prerequisites
 
-Please see the source file on how to configure your command line before running.
+* CMake - C/C++ build system
+* NCursesw - Library for interacting with the terminal
 
-Windows and Linux versions are available. See the relevant source directory for details.
+### Installation
 
-### Credit where credit is due
+* Ubuntu: `sudo apt-get install cmake libncursesw5-dev`
+* Fedora: `sudo dnf -y install cmake ncurses-devel`
+* Other distros: `¯\_(ツ)_/¯`
 
-Big thank you to [OneLoneCoder](https://github.com/OneLoneCoder) for building the groundwork for this
+## Build
 
-Big thanks as well to [rohanliston](https://github.com/rohanliston) for porting this to Linux and providing build files
+```sh
+mkdir build
+cd build
+cmake ..
+make
+```
 
-We're gonna make... something cool with this. I don't know what that thing will be.
+## Run
+
+`./CommandLineFPS`
+
+

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <algorithm>
 #include <chrono>
@@ -40,31 +41,44 @@ int main()
     init_pair(4, COLOR_BLUE, COLOR_BLACK);   // 'B'
     init_pair(5, COLOR_YELLOW, COLOR_BLACK); // 'Y'
 
-    wstring map; // THE WOLRD ARRAY
-    map += L"WWWWWWWWWWWWWWWWWW.RRR.W";
-    map += L"W................W.W.W.W";
-    map += L"R.......WWWWWWWW.W.....W";
-    map += L"R..............W.W.....W";
-    map += L"R......WW......W.W...W.W";
-    map += L"W......WW......W.W...W.W";
-    map += L"W..............W.W...W.W";
-    map += L"WWW............W.......W";
-    map += L"WW.............W.......W";
-    map += L"W......WWWW..WWW.......W";
-    map += L"W......W.......W...R...W";
-    map += L"W......W.......W.......W";
-    map += L"W..............W.......W";
-    map += L"W......WWYYYWWWW.......W";
-    map += L"W......................W";
-    map += L"W..............W.......W";
-    map += L"W..............W.......W";
-    map += L"W..............G.......W";
-    map += L"W......W.......G.......W";
-    map += L"W..............W.......W";
-    map += L"W......BW......B.......W";
-    map += L"W......WW......W.......W";
-    map += L"W..............W.......W";
-    map += L"WWWWWWWWWWWWRRWWWWWWWWWW";
+    string map = std::string{}; // THE WOLRD ARRAY
+
+    std::ifstream mapFile{ "Map.dat" };
+
+    if (!mapFile) 
+    {
+        endwin();
+        std::cerr << "Error. Cannot open map file. Does it actually exist?" << endl;
+        return 1;
+    }
+    
+    std::ostringstream sstr;
+    map << in.rdbuf();
+
+    // map += L"WWWWWWWWWWWWWWWWWW.RRR.W";
+    // map += L"W................W.W.W.W";
+    // map += L"R.......WWWWWWWW.W.....W";
+    // map += L"R..............W.W.....W";
+    // map += L"R......WW......W.W...W.W";
+    // map += L"W......WW......W.W...W.W";
+    // map += L"W..............W.W...W.W";
+    // map += L"WWW............W.......W";
+    // map += L"WW.............W.......W";
+    // map += L"W......WWWW..WWW.......W";
+    // map += L"W......W.......W...R...W";
+    // map += L"W......W.......W.......W";
+    // map += L"W..............W.......W";
+    // map += L"W......WWYYYWWWW.......W";
+    // map += L"W......................W";
+    // map += L"W..............W.......W";
+    // map += L"W..............W.......W";
+    // map += L"W..............G.......W";
+    // map += L"W......W.......G.......W";
+    // map += L"W..............W.......W";
+    // map += L"W......BW......B.......W";
+    // map += L"W......WW......W.......W";
+    // map += L"W..............W.......W";
+    // map += L"WWWWWWWWWWWWRRWWWWWWWWWW";
 
     auto tp1 = chrono::system_clock::now();
     auto tp2 = chrono::system_clock::now();
@@ -114,8 +128,8 @@ int main()
         int key = getch(); 
         
         // Increments of movement, depending on the player's actions.
-        float fXMovement = 0.0f;
-        float fYMovement = 0.0f;
+        float fMovementX = 0.0f;
+        float fMovementY = 0.0f;
 
         switch (key) {
             case 'k':
@@ -128,23 +142,23 @@ int main()
                 break;
             case 'a':
                 // Left movement
-                fXMovement += sinf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
-                fYMovement += cosf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
+                fMovementX += sinf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
+                fMovementY += cosf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
                 break;
             case 'd':
                 // Right movement
-                fXMovement += sinf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
-                fYMovement += cosf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
+                fMovementX += sinf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
+                fMovementY += cosf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
                 break;
             case 'w':
                 // Forward movement
-                fXMovement += sinf(fPlayerA) * fSpeed * fElapsedTime;;
-                fYMovement += cosf(fPlayerA) * fSpeed * fElapsedTime;;
+                fMovementX += sinf(fPlayerA) * fSpeed * fElapsedTime;;
+                fMovementY += cosf(fPlayerA) * fSpeed * fElapsedTime;;
                 break;
             case 's':
                 // Backward movement
-                fXMovement -= sinf(fPlayerA) * fSpeed * fElapsedTime;;
-                fYMovement -= cosf(fPlayerA) * fSpeed * fElapsedTime;;
+                fMovementX -= sinf(fPlayerA) * fSpeed * fElapsedTime;;
+                fMovementY -= cosf(fPlayerA) * fSpeed * fElapsedTime;;
                 break;
             case 'q':
                 // Quit
@@ -157,13 +171,13 @@ int main()
                 break;
         }
 
-        if (fXMovement != 0.0f || fYMovement != 0.0f)
+        if (fMovementX != 0.0f || fMovementY != 0.0f)
         {
             // What block the player hits, acquired by checking their
             // rounded position with an index in the world array.
             char collisionBlock = map.c_str()[
-                    (int) (fPlayerX+fXMovement) * nMapWidth + (int) (fPlayerY+fYMovement)
-                ];
+                (int) (fPlayerX+fMovementX) * nMapWidth + (int) (fPlayerY+fMovementY)
+            ];
             
             // The char in the world array that the player hit (could be empty)
             char *wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock); 
@@ -171,11 +185,12 @@ int main()
             // If the block we're about to hit isn't a wall, then allow the player to move.
             if (wallCollision == std::end(validWalls))
             {
-                fPlayerX += fXMovement;
-                fPlayerY += fYMovement;
+                fPlayerX += fMovementX;
+                fPlayerY += fMovementY;
             }
         }
 
+        // Rendering and graphics
         for (int x = 0; x < nScreenWidth; x++)
         {
             // For each column, calculate the projected ray angle into world space
@@ -285,11 +300,10 @@ int main()
             }
             
             if (bBoundary)
-                nShade = ' '; // Black it out
+                nShade = ' '; // Draw a seam between wall blocks
 
             for (int y = 0; y < nScreenHeight; y++)
             {
-            
                 // Each Section of the world
                 if(y <= nCeiling) // Ceiling
                 {
@@ -312,14 +326,13 @@ int main()
                     else if (b < 0.75)   nShade = '.';
                     else if (b < 0.9)    nShade = '-';
                     else                 nShade = ' ';
-                    mvaddch(y, x, nShade);
+                    wchar_t wstr[] = { nShade, L'\0' };
+                    mvaddwstr(y, x, wstr);
                 }
             }
         }
 
-        // Display Frame
-        // mvaddwstr(0, 0, screen);
-
+        // HUD Drawing and ncurses refreshing
         if (showHUD) {
             // Display Stats
             wchar_t stats[40];
@@ -339,7 +352,7 @@ int main()
             mvaddch((int)fPlayerX+1, ((int)fPlayerY), 'P');
         }
 
-        // Display instructions
+        // Display controls
         wchar_t instructions[40] = L"wsad=Move, kl=look, q=quit, h=HUD";
         attron(A_BOLD);
         mvaddwstr(nScreenHeight-1,0, instructions);
