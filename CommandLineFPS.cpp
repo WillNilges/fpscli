@@ -41,44 +41,20 @@ int main()
     init_pair(4, COLOR_BLUE, COLOR_BLACK);   // 'B'
     init_pair(5, COLOR_YELLOW, COLOR_BLACK); // 'Y'
 
+    // Get the map from a file
     string map = std::string{}; // THE WOLRD ARRAY
-
     std::ifstream mapFile{ "Map.dat" };
-
     if (!mapFile) 
     {
         endwin();
         std::cerr << "Error. Cannot open map file. Does it actually exist?" << endl;
         return 1;
     }
-    
-    std::ostringstream sstr;
-    map << in.rdbuf();
 
-    // map += L"WWWWWWWWWWWWWWWWWW.RRR.W";
-    // map += L"W................W.W.W.W";
-    // map += L"R.......WWWWWWWW.W.....W";
-    // map += L"R..............W.W.....W";
-    // map += L"R......WW......W.W...W.W";
-    // map += L"W......WW......W.W...W.W";
-    // map += L"W..............W.W...W.W";
-    // map += L"WWW............W.......W";
-    // map += L"WW.............W.......W";
-    // map += L"W......WWWW..WWW.......W";
-    // map += L"W......W.......W...R...W";
-    // map += L"W......W.......W.......W";
-    // map += L"W..............W.......W";
-    // map += L"W......WWYYYWWWW.......W";
-    // map += L"W......................W";
-    // map += L"W..............W.......W";
-    // map += L"W..............W.......W";
-    // map += L"W..............G.......W";
-    // map += L"W......W.......G.......W";
-    // map += L"W..............W.......W";
-    // map += L"W......BW......B.......W";
-    // map += L"W......WW......W.......W";
-    // map += L"W..............W.......W";
-    // map += L"WWWWWWWWWWWWRRWWWWWWWWWW";
+    std::ostringstream sstr;
+    sstr << mapFile.rdbuf();
+    map = sstr.str();
+    map.erase(std::remove(map.begin(), map.end(), '\n'), map.end());
 
     auto tp1 = chrono::system_clock::now();
     auto tp2 = chrono::system_clock::now();
