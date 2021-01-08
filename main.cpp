@@ -1,25 +1,19 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <algorithm>
-#include <chrono>
-#include <ncurses.h>
-#include <sstream>
-#include <cmath>
+#include "main.hpp"
+#include "player.h"
 
 using namespace std;
+using namespace BitBorn;
 
-int nScreenWidth = 120;       // Console Screen Size X (columns)
+int nScreenWidth  = 120;       // Console Screen Size X (columns)
 int nScreenHeight = 40;       // Console Screen Size Y (rows)
-int nMapWidth = 24;           // World Dimensions
-int nMapHeight = 24;
+int nMapWidth     = 24;           // World Dimensions
+int nMapHeight    = 24;
 
-float fPlayerX = 14.7f;       // Player Start Position
-float fPlayerY = 5.09f;
-float fPlayerA = 0.0f;        // Player Start Rotation
-float fFOV = 3.14159f / 4.0f; // Field of View
-float fDepth = 16.0f;         // Maximum rendering distance
-float fSpeed = 150.0f;        // Walking Speed
+// float fPlayerX = 14.7f;       // Player Start Position
+// float fPlayerY = 5.09f;
+// float fPlayerA = 0.0f;        // Player Start Rotation
+float fFOV        = 3.14159f / 4.0f; // Field of View
+float fDepth      = 16.0f;         // Maximum rendering distance
 
 char validWalls[5] = { 'W', 'R', 'G', 'B', 'Y' }; // Valid, collidable walls.
 
@@ -50,11 +44,12 @@ int main()
         std::cerr << "Error. Cannot open map file. Does it actually exist?" << endl;
         return 1;
     }
-
     std::ostringstream sstr;
     sstr << mapFile.rdbuf();
     map = sstr.str();
     map.erase(std::remove(map.begin(), map.end(), '\n'), map.end());
+
+    Player player(10, 10, 0);
 
     auto tp1 = chrono::system_clock::now();
     auto tp2 = chrono::system_clock::now();
@@ -99,43 +94,9 @@ int main()
             getmaxyx(stdscr, terminalHeight, terminalWidth);
         }
 
-
         // Player movement and world collision detection
-        int key = getch(); 
-        
-        // Increments of movement, depending on the player's actions.
-        float fMovementX = 0.0f;
-        float fMovementY = 0.0f;
-
+        int key = getch();
         switch (key) {
-            case 'k':
-                // CCW Rotation
-                fPlayerA -= (fSpeed * 0.75f) * fElapsedTime;
-                break;
-            case 'l':
-                // CW Rotation
-                fPlayerA += (fSpeed * 0.75f) * fElapsedTime;
-                break;
-            case 'a':
-                // Left movement
-                fMovementX += sinf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
-                fMovementY += cosf(fPlayerA-(0.5*3.14159)) * fSpeed * fElapsedTime;;
-                break;
-            case 'd':
-                // Right movement
-                fMovementX += sinf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
-                fMovementY += cosf(fPlayerA+(0.5*3.14159)) * fSpeed * fElapsedTime;;
-                break;
-            case 'w':
-                // Forward movement
-                fMovementX += sinf(fPlayerA) * fSpeed * fElapsedTime;;
-                fMovementY += cosf(fPlayerA) * fSpeed * fElapsedTime;;
-                break;
-            case 's':
-                // Backward movement
-                fMovementX -= sinf(fPlayerA) * fSpeed * fElapsedTime;;
-                fMovementY -= cosf(fPlayerA) * fSpeed * fElapsedTime;;
-                break;
             case 'q':
                 // Quit
                 finished = true;
@@ -144,27 +105,16 @@ int main()
                 showHUD = !showHUD;
                 break;
             default:
+                // Do player movement
+                player.move(key, map, fElapsedTime);
                 break;
         }
 
-        if (fMovementX != 0.0f || fMovementY != 0.0f)
-        {
-            // What block the player hits, acquired by checking their
-            // rounded position with an index in the world array.
-            char collisionBlock = map.c_str()[
-                (int) (fPlayerX+fMovementX) * nMapWidth + (int) (fPlayerY+fMovementY)
-            ];
-            
-            // The char in the world array that the player hit (could be empty)
-            char *wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock); 
-            
-            // If the block we're about to hit isn't a wall, then allow the player to move.
-            if (wallCollision == std::end(validWalls))
-            {
-                fPlayerX += fMovementX;
-                fPlayerY += fMovementY;
-            }
-        }
+        std::vector<float> pos = player.getPos();
+
+        float fPlayerX = pos.at(0);
+        float fPlayerY = pos.at(1);
+        float fPlayerA = pos.at(2);
 
         // Rendering and graphics
         for (int x = 0; x < nScreenWidth; x++)
