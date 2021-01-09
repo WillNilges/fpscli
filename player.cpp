@@ -62,3 +62,7 @@ bool Player::move(int key, string map, float fElapsedTime) {
         }
     }
 }
+
+std::vector<float> Player::getPos() {
+    return { Player::fPlayerX, Player::fPlayerY, Player::fPlayerA };
+}

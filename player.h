@@ -1,8 +1,3 @@
-// #include <algorithm>
-// #include <cmath>
-// #include <fstream>
-// #include <vector>
-
 #include "main.hpp"
 
 using namespace std;
@@ -17,9 +12,7 @@ namespace BitBorn
 
             bool move(int key, string map, float fElapsedTime);
 
-            std::vector<float> getPos() {
-                return { fPlayerX, fPlayerY, fPlayerA };
-            }
+            std::vector<float> getPos();
 
         private:
 
