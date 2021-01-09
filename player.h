@@ -10,7 +10,7 @@ namespace BitBorn
             Player(float x, float y, float a)
                 : fPlayerX(x), fPlayerY(y), fPlayerA(a){}
 
-            bool move(int key, string map, float fElapsedTime);
+            bool move(int key, std::vector<int> mapDimensions, string map, float fElapsedTime);
 
             std::vector<float> getPos();
 

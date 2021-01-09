@@ -12,7 +12,7 @@ add_compile_definitions(NCURSES_WIDECHAR)
 include_directories( ${CURSES_INCLUDE_DIRS} )
 
 # Add CommandLineFPS.cpp file of project root directory as source file
-set(SOURCE_FILES main.hpp main.cpp graphics.h graphics.cpp player.h player.cpp)
+set(SOURCE_FILES main.hpp main.cpp map.h map.cpp graphics.h graphics.cpp player.h player.cpp)
 
 # Copy map to build directory
 configure_file(Map.dat ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
