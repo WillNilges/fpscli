@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.12)   # CMake version check
-project(CommandLineFPS)               # Create project "CommandLineFPS"
+cmake_minimum_required(VERSION 3.12)  # CMake version check
+project(BitBorn)                      # Create project "BitBorn"
 set(CMAKE_CXX_STANDARD 11)            # Enable c++11 standard
 
 # Include our FindNcursesw.cmake file
