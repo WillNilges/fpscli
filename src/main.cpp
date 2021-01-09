@@ -71,7 +71,7 @@ int main() {
             break;
         default:
             // Do player movement
-            player.move(key, mapDimensions, mapString, fElapsedTime);
+            player.move(key, mapDimensions, mapString, map.getValidWalls(), fElapsedTime);
             break;
         }
 

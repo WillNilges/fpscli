@@ -7,7 +7,7 @@ class Player {
   public:
     Player(float x, float y, float a) : fPlayerX(x), fPlayerY(y), fPlayerA(a) {}
 
-    bool move(int key, std::vector<int> mapDimensions, std::string map, float fElapsedTime);
+    bool move(int key, std::vector<int> mapDimensions, std::string map, std::vector<char> validWalls, float fElapsedTime);
 
     std::vector<float> getPos();
 

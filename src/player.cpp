@@ -4,9 +4,7 @@
 
 using namespace BitBorn;
 
-bool Player::move(int key, std::vector<int> mapDimensions, std::string map, float fElapsedTime) {
-    char validWalls[5] = {'W', 'R', 'G', 'B', 'Y'}; // Valid, collidable walls.
-
+bool Player::move(int key, std::vector<int> mapDimensions, std::string map, std::vector<char> validWalls, float fElapsedTime) {   
     // Increments of movement, depending on the player's actions.
     float fMovementX = 0.0f;
     float fMovementY = 0.0f;
@@ -50,15 +48,11 @@ bool Player::move(int key, std::vector<int> mapDimensions, std::string map, floa
         char collisionBlock =
             map.c_str()[(int)(Player::fPlayerX + fMovementX) * mapDimensions[1] + (int)(Player::fPlayerY + fMovementY)];
 
-        // The char in the world array that the player hit (could be empty)
-        char *wallCollision = std::find(std::begin(validWalls), std::end(validWalls), collisionBlock);
-
-        // If the block we're about to hit isn't a wall, then allow the player
-        // to move.
-        if (wallCollision == std::end(validWalls)) {
-            Player::fPlayerX += fMovementX;
-            Player::fPlayerY += fMovementY;
-        }
+        // If the block we're about to hit isn't a wall, then allow the player to move.
+        if (std::find(validWalls.begin(), validWalls.end(), collisionBlock) != validWalls.end())
+            return false;
+        Player::fPlayerX += fMovementX;
+        Player::fPlayerY += fMovementY;
     }
     return true;
 }
