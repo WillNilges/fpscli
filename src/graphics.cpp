@@ -14,6 +14,7 @@ Graphics::Graphics(int screenWidth, int screenHeight, float fieldOfView, float d
     curs_set(0);           // Don't show terminal cursor
     nodelay(stdscr, true); // Don't halt program while waiting for input
     cbreak();              // Make input characters immediately available to the program
+    resizeterm(40,120);
 
     // Colors!
     start_color();

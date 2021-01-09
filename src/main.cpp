@@ -44,14 +44,14 @@ int main() {
         std::vector<int> screenDimensions = graphics.getScreenDimensions();
 
         // Ensure terminal size is OK
-        while (terminalHeight != screenDimensions[0] || terminalWidth != screenDimensions[1]) {
+        while (terminalHeight < screenDimensions[0] || terminalWidth < screenDimensions[1]) {
             if (!cleared) {
                 clear();
                 cleared = true;
             }
 
             std::ostringstream out;
-            out << "Resize your terminal to (" << screenDimensions[1] << ", " << screenDimensions[0]
+            out << "Resize your terminal to at least (" << screenDimensions[1] << ", " << screenDimensions[0]
                 << ") - current size is (" << terminalWidth << ", " << terminalHeight << ")";
             mvaddstr(0, 0, out.str().c_str());
             refresh();
