@@ -23,30 +23,22 @@ bool Player::move(int key, std::vector<int> mapDimensions, std::string map, floa
     case 'a':
         // Left movement
         fMovementX += sinf(Player::fPlayerA - (0.5 * 3.14159)) * fSpeed * fElapsedTime;
-        ;
         fMovementY += cosf(Player::fPlayerA - (0.5 * 3.14159)) * fSpeed * fElapsedTime;
-        ;
         break;
     case 'd':
         // Right movement
         fMovementX += sinf(Player::fPlayerA + (0.5 * 3.14159)) * fSpeed * fElapsedTime;
-        ;
         fMovementY += cosf(Player::fPlayerA + (0.5 * 3.14159)) * fSpeed * fElapsedTime;
-        ;
         break;
     case 'w':
         // Forward movement
         fMovementX += sinf(Player::fPlayerA) * fSpeed * fElapsedTime;
-        ;
         fMovementY += cosf(Player::fPlayerA) * fSpeed * fElapsedTime;
-        ;
         break;
     case 's':
         // Backward movement
         fMovementX -= sinf(Player::fPlayerA) * fSpeed * fElapsedTime;
-        ;
         fMovementY -= cosf(Player::fPlayerA) * fSpeed * fElapsedTime;
-        ;
         break;
     default:
         break;
