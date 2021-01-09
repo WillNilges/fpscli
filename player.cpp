@@ -3,7 +3,7 @@
 using namespace std;
 using namespace BitBorn;
 
-bool Player::move(int key, string map, float fElapsedTime) {   
+bool Player::move(int key, std::vector<int> mapDimensions, string map, float fElapsedTime) {   
     char validWalls[5] = { 'W', 'R', 'G', 'B', 'Y' }; // Valid, collidable walls.
    
     // Increments of movement, depending on the player's actions.
@@ -48,7 +48,7 @@ bool Player::move(int key, string map, float fElapsedTime) {
         // What block the player hits, acquired by checking their
         // rounded position with an index in the world array.
         char collisionBlock = map.c_str()[
-            (int) (Player::fPlayerX+fMovementX) * nMapWidth + (int) (Player::fPlayerY+fMovementY)
+            (int) (Player::fPlayerX+fMovementX) * mapDimensions[1] + (int) (Player::fPlayerY+fMovementY)
         ];
         
         // The char in the world array that the player hit (could be empty)

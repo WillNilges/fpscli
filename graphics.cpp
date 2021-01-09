@@ -3,16 +3,17 @@
 using namespace std;
 using namespace BitBorn;
 
-void Graphics::renderFrame(std::vector<float> playerPos, string map)
+
+// Rendering and graphics
+void Graphics::renderFrame(std::vector<float> playerPos, std::vector<int> mapDimensions, string map, std::vector<char> validWalls)
 {
-
-    char validWalls[5] = { 'W', 'R', 'G', 'B', 'Y' }; // Valid, collidable walls. // DEBUG
-
-    // Rendering and graphics
-    // std::vector<float> pos = player.getPos();
+    // Cursed but readable
     float fPlayerX = playerPos.at(0);
     float fPlayerY = playerPos.at(1);
     float fPlayerA = playerPos.at(2);
+
+    int nMapHeight = mapDimensions.at(0);
+    int nMapWidth = mapDimensions.at(1);
 
     for (int x = 0; x < Graphics::nScreenWidth; x++)
     {
@@ -50,8 +51,7 @@ void Graphics::renderFrame(std::vector<float> playerPos, string map)
             {
                 // Ray is inbounds so test to see if the ray cell is a wall block.
                 wallBlock = map.c_str()[nTestX * nMapWidth + nTestY];
-                char *isWall = std::find(std::begin(validWalls), std::end(validWalls), wallBlock);
-                if (isWall != std::end(validWalls))
+                if (std::find(validWalls.begin(), validWalls.end(), wallBlock) != validWalls.end())
                 {
                     // Ray has hit wall
                     bHitWall = true;
@@ -156,11 +156,15 @@ void Graphics::renderFrame(std::vector<float> playerPos, string map)
     }
 }
 
-void Graphics::renderHUD(std::vector<float> playerPos, float fElapsedTime, string map)
+void Graphics::renderHUD(std::vector<float> playerPos, std::vector<int> mapDimensions, string map, float fElapsedTime)
 {
+    // Cursed but readable
     float fPlayerX = playerPos.at(0);
     float fPlayerY = playerPos.at(1);
     float fPlayerA = playerPos.at(2);
+
+    int nMapHeight = mapDimensions.at(0);
+    int nMapWidth = mapDimensions.at(1);
 
     // Display Stats
     wchar_t stats[40];

@@ -25,8 +25,8 @@ namespace BitBorn {
                 init_pair(5, COLOR_YELLOW, COLOR_BLACK); // 'Y'
             }
 
-            void renderFrame(std::vector<float> playerPos, string map);
-            void renderHUD(std::vector<float> playerPos, float fElapsedTime, string map);
+            void renderFrame(std::vector<float> playerPos, std::vector<int> mapDimensions, string map, std::vector<char> validWalls);
+            void renderHUD(std::vector<float> playerPos, std::vector<int> mapDimensions, string map, float fElapsedTime);
             void renderControls();
 
             std::vector<int> getScreenDimensions();
@@ -36,5 +36,7 @@ namespace BitBorn {
                 int nScreenHeight{ 40 };
                 float fFOV{ 3.14159f / 4.0f };
                 float fDepth{ 16.0f };
+
+                bool showHUD{ false };
     };
 }
