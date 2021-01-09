@@ -12,13 +12,14 @@ add_compile_definitions(NCURSES_WIDECHAR)
 include_directories( ${CURSES_INCLUDE_DIRS} )
 
 # Add CommandLineFPS.cpp file of project root directory as source file
-set(SOURCE_FILES main.hpp main.cpp map.h map.cpp graphics.h graphics.cpp player.h player.cpp)
+include_directories( include/ )
+file(GLOB SOURCES src/*.cpp)
 
 # Copy map to build directory
-configure_file(Map.dat ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+configure_file(res/Map.dat ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 # Add executable target with source files listed in SOURCE_FILES variable
-add_executable(BitBorn ${SOURCE_FILES})
+add_executable(BitBorn ${SOURCES})
 
 # Link ncursesw library
 target_link_libraries( BitBorn ${CURSES_LIBRARIES} )
