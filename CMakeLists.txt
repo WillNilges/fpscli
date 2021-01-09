@@ -3,6 +3,7 @@ project(BitBorn)                      # Create project "BitBorn"
 set(CMAKE_CXX_STANDARD 11)            # Enable c++11 standard
 
 # Include our FindNcursesw.cmake file
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Find Ncursesw
 find_package( PkgConfig REQUIRED )
