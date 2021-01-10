@@ -12,9 +12,12 @@ class Graphics {
     void renderHUD(fCoord25D playerPos, std::vector<int> mapDimensions, std::string map, float fElapsedTime);
     void renderControls();
 
-    std::vector<int> getScreenDimensions();
+    ~Graphics();
 
   private:
+    int terminalWidth;
+    int terminalHeight;
+
     int nScreenWidth{120};
     int nScreenHeight{40};
     float fFOV{3.14159f / 4.0f};

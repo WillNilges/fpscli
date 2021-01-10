@@ -6,7 +6,6 @@
 #include <chrono>
 #include <iostream>
 #include <ncurses.h>
-#include <sstream>
 #include <vector>
 
 using namespace BitBorn;
@@ -44,29 +43,6 @@ int main() {
         std::chrono::duration<float> elapsedTime = tp2 - tp1;
         tp1 = tp2;
         float fElapsedTime = elapsedTime.count();
-
-        // Measure terminal size
-        int terminalWidth;
-        int terminalHeight;
-        bool cleared = false;
-        getmaxyx(stdscr, terminalHeight, terminalWidth);
-
-        std::vector<int> screenDimensions = graphics.getScreenDimensions();
-
-        // Ensure terminal size is OK
-        while (terminalHeight < screenDimensions[0] || terminalWidth < screenDimensions[1]) {
-            if (!cleared) {
-                clear();
-                cleared = true;
-            }
-
-            std::ostringstream out;
-            out << "Resize your terminal to at least (" << screenDimensions[1] << ", " << screenDimensions[0]
-                << ") - current size is (" << terminalWidth << ", " << terminalHeight << ")";
-            mvaddstr(0, 0, out.str().c_str());
-            refresh();
-            getmaxyx(stdscr, terminalHeight, terminalWidth);
-        }
 
         // Player movement and world collision detection
         int key = getch();

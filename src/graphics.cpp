@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cmath>
 #include <ncurses.h>
+#include <sstream>
 
 using namespace BitBorn;
 
@@ -14,7 +15,9 @@ Graphics::Graphics(int screenWidth, int screenHeight, float fieldOfView, float d
     curs_set(0);           // Don't show terminal cursor
     nodelay(stdscr, true); // Don't halt program while waiting for input
     cbreak();              // Make input characters immediately available to the program
-    resizeterm(40,120);
+
+    getmaxyx(stdscr, terminalHeight, terminalWidth);
+    resizeterm(40, 120);
 
     // Colors!
     start_color();
@@ -27,6 +30,25 @@ Graphics::Graphics(int screenWidth, int screenHeight, float fieldOfView, float d
 
 // Rendering and graphics
 void Graphics::renderFrame(fCoord25D playerPos, std::vector<int> mapDimensions, std::string map, std::vector<char> validWalls) {
+
+    // Measure terminal size
+    bool cleared = false;
+    getmaxyx(stdscr, terminalHeight, terminalWidth);
+
+    // Ensure terminal size is OK
+    while (terminalHeight < nScreenHeight || terminalWidth < nScreenWidth) {
+        if (!cleared) {
+            clear();
+            cleared = true;
+        }
+
+        std::ostringstream out;
+        out << "Resize your terminal to at least (" << nScreenWidth << ", " << nScreenHeight
+            << ") - current size is (" << terminalWidth << ", " << terminalHeight << ")";
+        mvaddstr(0, 0, out.str().c_str());
+        refresh();
+        getmaxyx(stdscr, terminalHeight, terminalWidth);
+    }
 
     int nMapHeight = mapDimensions.at(0);
     int nMapWidth = mapDimensions.at(1);
@@ -214,4 +236,6 @@ void Graphics::renderControls() {
     attroff(A_BOLD);
 }
 
-std::vector<int> Graphics::getScreenDimensions() { return {Graphics::nScreenHeight, Graphics::nScreenWidth}; }
+Graphics::~Graphics() {
+    resizeterm(terminalHeight, terminalWidth);
+}
