@@ -8,6 +8,7 @@
 #include <iostream>
 #include <ncurses.h>
 #include <vector>
+#include <array>
 
 using namespace BitBorn;
 
@@ -25,9 +26,8 @@ const char KEY_SHOW_HUD = 'h';
 
 int main() {
     Graphics graphics(120, 40, (3.14159f / 4.0f), 16.0f); // Initialize graphics
-    Map map("Map.dat", 24,
-            24);                // Get the map from a file and instantiate a map object
-    Player player({10, 10, 0}); // Set up the player object
+    Map map("Map.dat", 34, 25); // Get the map from a file and instantiate a map object
+    Player player({ 2, 2, 0 }); // Set up the player object
 
     // Acquire map data. Yoink.
     std::array<int, 2> mapDimensions = map.getDimensions();

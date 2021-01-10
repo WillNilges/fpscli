@@ -26,6 +26,10 @@ Graphics::Graphics(int screenWidth, int screenHeight, float fieldOfView, float d
     init_pair(3, COLOR_GREEN, COLOR_BLACK);  // 'G'
     init_pair(4, COLOR_BLUE, COLOR_BLACK);   // 'B'
     init_pair(5, COLOR_YELLOW, COLOR_BLACK); // 'Y'
+
+    // The sky
+    init_color(COLOR_MAGENTA, 320, 675, 825);
+    init_pair(14, COLOR_MAGENTA, COLOR_BLACK);
 }
 
 // Rendering and graphics
@@ -80,7 +84,7 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
             int nTestY = (int)(playerPos.y + fEyeY * fDistanceToWall);
 
             // Test if ray is out of bounds
-            if (nTestX < 0 || nTestX >= nMapWidth || nTestY < 0 || nTestY >= nMapHeight) {
+            if ((nTestX < 0 || nTestX >= nMapWidth) && (nTestY < 0 || nTestY >= nMapHeight)) {
                 bHitWall = true; // Just set distance to maximum depth
                 fDistanceToWall = fDepth;
             } else {
@@ -177,7 +181,11 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
             // Each Section of the world
             if (y <= nCeiling) // Ceiling
             {
-                mvaddch(y, x, ' ');
+                // mvaddch(y, x, ' ');
+                attron(COLOR_PAIR(14));
+                wchar_t wstr[] = {0x2593, L'\0'};
+                mvaddwstr(y, x, wstr);
+                attroff(COLOR_PAIR(14));
             } else if (y > nCeiling && y <= nFloor) // Walls
             {
                 attron(COLOR_PAIR(color));
@@ -209,8 +217,8 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
 
 void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, std::string map, float fElapsedTime) {
 
-    int nMapHeight = mapDimensions.at(0);
-    int nMapWidth = mapDimensions.at(1);
+    int nMapWidth = mapDimensions.at(0);
+    int nMapHeight = mapDimensions.at(1);
 
     // Display Stats
     wchar_t stats[40];
@@ -218,15 +226,25 @@ void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, 
              1.0f / fElapsedTime);
     mvaddwstr(0, 0, stats);
 
-    // Display Map
-    for (int nx = 0; nx < nMapWidth; nx++) {
-        for (int ny = 0; ny < nMapWidth; ny++) {
-            mvaddch(ny + 1, nx, (chtype)map[ny * nMapWidth + nx]);
+    int minimapDimension = 21; // The minimap will be 21x21 characters
+    int shift = minimapDimension/2;
+    int xStart = floor(playerPos.y + 0.5)-shift;
+    int yStart = floor(playerPos.x + 0.5)-shift;
+
+    for (int nx = 0; nx < minimapDimension; nx++) {
+        for (int ny = 0; ny < minimapDimension; ny++) {
+            int formula = (yStart+ny) * nMapHeight + (xStart+nx);
+            if ((formula) < 0 || (formula) > map.length() || (xStart+nx) < 0 || (xStart+nx) >= nMapHeight)
+                mvaddch(ny + 1, nx, ' ');
+            else
+                mvaddch(ny + 1, nx, (chtype)map[formula]);
         }
     }
 
     // Display Player
-    mvaddch((int)playerPos.x + 1, ((int)playerPos.y), 'P');
+    attron(COLOR_PAIR(2));
+    mvaddch((minimapDimension/2)+1, (minimapDimension/2), 'P');
+    attroff(COLOR_PAIR(2));
 }
 
 void Graphics::renderControls() {
