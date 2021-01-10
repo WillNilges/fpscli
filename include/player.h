@@ -1,6 +1,8 @@
+#pragma once
+
+#include "types.h"
 #include <string>
 #include <vector>
-#include "types.h"
 
 // Player object
 namespace BitBorn {

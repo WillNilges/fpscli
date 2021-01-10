@@ -1,7 +1,9 @@
+#pragma once
+
+#include "types.h"
+#include <array>
 #include <string>
 #include <vector>
-#include <array>
-#include "types.h"
 
 namespace BitBorn {
 class Map {

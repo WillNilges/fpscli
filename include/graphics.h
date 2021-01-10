@@ -1,7 +1,9 @@
-#include <string>
-#include <array>
-#include <vector>
+#pragma once
+
 #include "types.h"
+#include <array>
+#include <string>
+#include <vector>
 
 namespace BitBorn {
 class Graphics {

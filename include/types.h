@@ -1,11 +1,5 @@
+#pragma once
 namespace BitBorn{
-#ifndef __TYPES_H_
-#define __TYPES_H_
-    struct fCoord25D {
-        float x;
-        float y;
-        float a;
-    };
 
     enum action {
         MOVE_FORWARD,
@@ -15,5 +9,9 @@ namespace BitBorn{
         LOOK_LEFT,
         LOOK_RIGHT
     };
-#endif // __TYPES_H_
-}
+struct fCoord25D {
+    float x;
+    float y;
+    float a;
+};
+} // namespace BitBorn
