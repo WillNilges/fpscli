@@ -26,10 +26,6 @@ Graphics::Graphics(int screenWidth, int screenHeight, float fieldOfView, float d
     init_pair(3, COLOR_GREEN, COLOR_BLACK);  // 'G'
     init_pair(4, COLOR_BLUE, COLOR_BLACK);   // 'B'
     init_pair(5, COLOR_YELLOW, COLOR_BLACK); // 'Y'
-
-    // The sky
-    init_color(COLOR_MAGENTA, 320, 675, 825);
-    init_pair(14, COLOR_MAGENTA, COLOR_BLACK);
 }
 
 // Rendering and graphics
@@ -181,11 +177,7 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
             // Each Section of the world
             if (y <= nCeiling) // Ceiling
             {
-                // mvaddch(y, x, ' ');
-                attron(COLOR_PAIR(14));
-                wchar_t wstr[] = {0x2593, L'\0'};
-                mvaddwstr(y, x, wstr);
-                attroff(COLOR_PAIR(14));
+                mvaddch(y, x, ' ');
             } else if (y > nCeiling && y <= nFloor) // Walls
             {
                 attron(COLOR_PAIR(color));
@@ -228,8 +220,8 @@ void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, 
 
     int minimapDimension = 21; // The minimap will be 21x21 characters
     int shift = minimapDimension/2;
-    int xStart = round(playerPos.y)-shift;
-    int yStart = round(playerPos.x)-shift;
+    int xStart = floor(playerPos.y)-shift;
+    int yStart = floor(playerPos.x)-shift;
 
     for (int nx = 0; nx < minimapDimension; nx++) {
         for (int ny = 0; ny < minimapDimension; ny++) {
