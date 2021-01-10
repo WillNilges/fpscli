@@ -25,8 +25,8 @@ const char KEY_SHOW_HUD = 'h';
 int main() {
     Graphics graphics(120, 40, (3.14159f / 4.0f), 16.0f); // Initialize graphics
     Map map("Map.dat", 24,
-            24);              // Get the map from a file and instantiate a map object
-    Player player({ 10, 10, 0 }); // Set up the player object
+            24);                // Get the map from a file and instantiate a map object
+    Player player({10, 10, 0}); // Set up the player object
 
     // Acquire map data. Yoink.
     std::array<int, 2> mapDimensions = map.getDimensions();
@@ -46,7 +46,7 @@ int main() {
 
         // Player movement and world collision detection
         int key = getch();
-        struct fCoord25D proposedMovement = { 0.0f, 0.0f, 0.0f };
+        struct fCoord25D proposedMovement = {0.0f, 0.0f, 0.0f};
         switch (key) {
         case KEY_QUIT:
             // Quit

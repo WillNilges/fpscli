@@ -11,7 +11,7 @@ enum Action { MOVE_FORWARD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, LOOK_LEFT, LOOK_RI
 
 class Player {
   public:
-    Player(fCoord25D position) : position(position){}
+    Player(fCoord25D position) : position(position) {}
 
     fCoord25D stageMovement(Action stagedAction, float fElapsedTime);
     void look(Action stagedAction, float fElapsedTime);

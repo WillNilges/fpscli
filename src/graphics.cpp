@@ -29,7 +29,8 @@ Graphics::Graphics(int screenWidth, int screenHeight, float fieldOfView, float d
 }
 
 // Rendering and graphics
-void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions, std::string map, std::vector<char> validWalls) {
+void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions, std::string map,
+                           std::vector<char> validWalls) {
 
     // Measure terminal size
     bool cleared = false;
@@ -206,15 +207,15 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
     }
 }
 
-void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, std::string map,
-                         float fElapsedTime) {
+void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, std::string map, float fElapsedTime) {
 
     int nMapHeight = mapDimensions.at(0);
     int nMapWidth = mapDimensions.at(1);
 
     // Display Stats
     wchar_t stats[40];
-    swprintf(stats, 40, L"X=%3.2f, Y=%3.2f, A=%3.2f FPS=%3.2f ", playerPos.x, playerPos.y, playerPos.a, 1.0f / fElapsedTime);
+    swprintf(stats, 40, L"X=%3.2f, Y=%3.2f, A=%3.2f FPS=%3.2f ", playerPos.x, playerPos.y, playerPos.a,
+             1.0f / fElapsedTime);
     mvaddwstr(0, 0, stats);
 
     // Display Map
