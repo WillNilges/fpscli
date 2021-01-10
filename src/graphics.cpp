@@ -228,8 +228,8 @@ void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, 
 
     int minimapDimension = 21; // The minimap will be 21x21 characters
     int shift = minimapDimension/2;
-    int xStart = floor(playerPos.y + 0.5)-shift;
-    int yStart = floor(playerPos.x + 0.5)-shift;
+    int xStart = round(playerPos.y)-shift;
+    int yStart = round(playerPos.x)-shift;
 
     for (int nx = 0; nx < minimapDimension; nx++) {
         for (int ny = 0; ny < minimapDimension; ny++) {

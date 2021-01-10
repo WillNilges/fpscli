@@ -14,12 +14,6 @@ Map::Map(std::string mapFilePath, int nMapWidth, int nMapHeight) : nMapWidth(nMa
         endwin();
         std::cerr << "Error. Cannot open map file. Does it actually exist?" << std::endl;
     }
-    if (nMapWidth != nMapHeight) {
-        endwin();
-        std::cout << "The world gets a bit funky when nMapWidth != "
-                     "nMapHeight. Correct that and try again."
-                  << std::endl;
-    }
     std::ostringstream sstr;
     sstr << mapFile.rdbuf();
     map = sstr.str();
