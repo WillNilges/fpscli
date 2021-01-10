@@ -4,6 +4,7 @@
 #include "types.h"
 
 #include <chrono>
+#include <cmath>
 #include <iostream>
 #include <ncurses.h>
 #include <vector>
@@ -46,7 +47,7 @@ int main() {
 
         // Player movement and world collision detection
         int key = getch();
-        struct fCoord25D proposedMovement = {0.0f, 0.0f, 0.0f};
+        struct fCoord25D proposedMovement = {NAN, NAN, NAN};
         switch (key) {
         case KEY_QUIT:
             // Quit
@@ -76,7 +77,7 @@ int main() {
             break;
         }
 
-        if (proposedMovement.x != 0.0f || proposedMovement.y != 0.0f || proposedMovement.a != 0.0f) {
+        if (!std::isnan(proposedMovement.x) || !std::isnan(proposedMovement.y) || !std::isnan(proposedMovement.a)) {
             bool movementValid = map.getCollision(proposedMovement);
             if (movementValid)
                 player.setPosition(proposedMovement);
