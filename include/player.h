@@ -6,12 +6,15 @@
 
 // Player object
 namespace BitBorn {
+
+enum Action { MOVE_FORWARD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, LOOK_LEFT, LOOK_RIGHT };
+
 class Player {
   public:
     Player(fCoord25D position) : position(position){}
 
-    fCoord25D stageMovement(action stagedAction, float fElapsedTime);
-    void look(action stagedAction, float fElapsedTime);
+    fCoord25D stageMovement(Action stagedAction, float fElapsedTime);
+    void look(Action stagedAction, float fElapsedTime);
 
     fCoord25D getPosition();
     void setPosition(fCoord25D newPosition);

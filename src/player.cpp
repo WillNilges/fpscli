@@ -4,7 +4,7 @@
 
 using namespace BitBorn;
 
-fCoord25D Player::stageMovement(action stagedAction, float fElapsedTime) {
+fCoord25D Player::stageMovement(Action stagedAction, float fElapsedTime) {
     struct fCoord25D stagedPosition = Player::position;
     switch (stagedAction) {
         case MOVE_FORWARD:
@@ -25,11 +25,13 @@ fCoord25D Player::stageMovement(action stagedAction, float fElapsedTime) {
             stagedPosition.x += sinf(stagedPosition.a + (0.5 * 3.14159)) * fSpeed * fElapsedTime;
             stagedPosition.y += cosf(stagedPosition.a + (0.5 * 3.14159)) * fSpeed * fElapsedTime;
             break;
+    default:
+        break;
     }
     return stagedPosition;
 }
 
-void Player::look(action stagedAction, float fElapsedTime) {
+void Player::look(Action stagedAction, float fElapsedTime) {
     switch (stagedAction) {
         case LOOK_LEFT:
             // CCW Rotation
@@ -39,6 +41,8 @@ void Player::look(action stagedAction, float fElapsedTime) {
             // CW Rotation
             Player::position.a += (fSpeed * 0.75f) * fElapsedTime;
             break;
+    default:
+        break;
     }
 }
 
