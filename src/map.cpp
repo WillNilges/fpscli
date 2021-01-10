@@ -1,4 +1,5 @@
 #include "map.h"
+#include "types.h"
 #include <algorithm>
 #include <curses.h>
 #include <fstream>
@@ -30,3 +31,12 @@ std::string Map::getMap() { return Map::map; }
 std::vector<int> Map::getDimensions() { return {Map::nMapHeight, Map::nMapWidth}; }
 
 std::vector<char> Map::getValidWalls() { return Map::validWalls; }
+
+bool Map::getCollision(fCoord25D coordinates) {
+    char collisionBlock = map.c_str()[(int)(coordinates.x) * Map::nMapWidth + (int)(coordinates.y)];
+
+    // If the block we're about to hit isn't a wall, then allow the player to move.
+    if (std::find(validWalls.begin(), validWalls.end(), collisionBlock) != validWalls.end())
+        return false;
+    return true;
+}

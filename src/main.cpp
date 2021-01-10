@@ -1,6 +1,7 @@
 #include "graphics.h"
 #include "map.h"
 #include "player.h"
+#include "types.h"
 
 #include <chrono>
 #include <iostream>
@@ -13,11 +14,20 @@ using namespace BitBorn;
 bool finished = false;
 bool showHUD = false;
 
+const char KEY_MOVE_FORWARD = 'w';
+const char KEY_MOVE_BACK = 's';
+const char KEY_MOVE_LEFT = 'a';
+const char KEY_MOVE_RIGHT = 'd';
+const char KEY_LOOK_LEFT = 'k';
+const char KEY_LOOK_RIGHT = 'l';
+const char KEY_QUIT = 'q';
+const char KEY_SHOW_HUD = 'h';
+
 int main() {
     Graphics graphics(120, 40, (3.14159f / 4.0f), 16.0f); // Initialize graphics
     Map map("Map.dat", 24,
             24);              // Get the map from a file and instantiate a map object
-    Player player(10, 10, 0); // Set up the player object
+    Player player({ 10, 10, 0 }); // Set up the player object
 
     // Acquire map data. Yoink.
     std::vector<int> mapDimensions = map.getDimensions();
@@ -60,22 +70,43 @@ int main() {
 
         // Player movement and world collision detection
         int key = getch();
+        struct fCoord25D proposedMovement = { 0.0f, 0.0f, 0.0f };
         switch (key) {
-        case 'q':
+        case KEY_QUIT:
             // Quit
             finished = true;
             break;
-        case 'h':
+        case KEY_SHOW_HUD:
             // Toggle hud
             showHUD = !showHUD;
             break;
-        default:
-            // Do player movement
-            player.move(key, mapDimensions, mapString, map.getValidWalls(), fElapsedTime);
+        case KEY_MOVE_FORWARD:
+            proposedMovement = player.stageMovement(MOVE_FORWARD, fElapsedTime);
+            break;
+        case KEY_MOVE_BACK:
+            proposedMovement = player.stageMovement(MOVE_BACK, fElapsedTime);
+            break;
+        case KEY_MOVE_LEFT:
+            proposedMovement = player.stageMovement(MOVE_LEFT, fElapsedTime);
+            break;
+        case KEY_MOVE_RIGHT:
+            proposedMovement = player.stageMovement(MOVE_RIGHT, fElapsedTime);
+            break;
+        case KEY_LOOK_LEFT:
+            player.look(LOOK_LEFT, fElapsedTime);
+            break;
+        case KEY_LOOK_RIGHT:
+            player.look(LOOK_RIGHT, fElapsedTime);
             break;
         }
 
-        std::vector<float> playerPos = player.getPos();
+        if (proposedMovement.x != 0.0f || proposedMovement.y != 0.0f || proposedMovement.a != 0.0f) {
+            bool movementValid = map.getCollision(proposedMovement);
+            if (movementValid)
+                player.setPosition(proposedMovement);
+        }
+
+        fCoord25D playerPos = player.getPosition();
 
         // Render current frame
         graphics.renderFrame(playerPos, mapDimensions, mapString, map.getValidWalls());

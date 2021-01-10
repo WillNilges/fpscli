@@ -1,22 +1,24 @@
 #include <string>
 #include <vector>
+#include "types.h"
 
 // Player object
 namespace BitBorn {
 class Player {
   public:
-    Player(float x, float y, float a) : fPlayerX(x), fPlayerY(y), fPlayerA(a) {}
+    Player(fCoord25D position) : position(position){}
 
-    bool move(int key, std::vector<int> mapDimensions, std::string map, std::vector<char> validWalls, float fElapsedTime);
+    fCoord25D stageMovement(action stagedAction, float fElapsedTime);
+    void look(action stagedAction, float fElapsedTime);
+    // bool move(int key, std::vector<int> mapDimensions, std::string map, std::vector<char> validWalls, float fElapsedTime);
 
-    std::vector<float> getPos();
+    fCoord25D getPosition();
+    void setPosition(fCoord25D newPosition);
 
   private:
     // Stuff that will change
     int health{100};
-    float fPlayerX{10.0f};
-    float fPlayerY{10.0f};
-    float fPlayerA{10.0f};
+    fCoord25D position{10.0f, 10.0f, 10.0f};
 
     // Stuff that will probably not change.
     float fSpeed{150.0f}; // Walking Speed

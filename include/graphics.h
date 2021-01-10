@@ -1,14 +1,15 @@
 #include <string>
 #include <vector>
+#include "types.h"
 
 namespace BitBorn {
 class Graphics {
   public:
     Graphics(int screenWidth, int screenHeight, float fieldOfView, float depth);
 
-    void renderFrame(std::vector<float> playerPos, std::vector<int> mapDimensions, std::string map,
+    void renderFrame(fCoord25D playerPos, std::vector<int> mapDimensions, std::string map,
                      std::vector<char> validWalls);
-    void renderHUD(std::vector<float> playerPos, std::vector<int> mapDimensions, std::string map, float fElapsedTime);
+    void renderHUD(fCoord25D playerPos, std::vector<int> mapDimensions, std::string map, float fElapsedTime);
     void renderControls();
 
     std::vector<int> getScreenDimensions();

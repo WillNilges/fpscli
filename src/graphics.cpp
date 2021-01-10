@@ -26,19 +26,14 @@ Graphics::Graphics(int screenWidth, int screenHeight, float fieldOfView, float d
 }
 
 // Rendering and graphics
-void Graphics::renderFrame(std::vector<float> playerPos, std::vector<int> mapDimensions, std::string map,
-                           std::vector<char> validWalls) {
-    // Cursed but readabl// e
-    float fPlayerX = playerPos.at(0);
-    float fPlayerY = playerPos.at(1);
-    float fPlayerA = playerPos.at(2);
+void Graphics::renderFrame(fCoord25D playerPos, std::vector<int> mapDimensions, std::string map, std::vector<char> validWalls) {
 
     int nMapHeight = mapDimensions.at(0);
     int nMapWidth = mapDimensions.at(1);
 
     for (int x = 0; x < Graphics::nScreenWidth; x++) {
         // For each column, calculate the projected ray angle into world space
-        float fRayAngle = (fPlayerA - fFOV / 2.0f) + ((float)x / (float)Graphics::nScreenWidth) * fFOV;
+        float fRayAngle = (playerPos.a - fFOV / 2.0f) + ((float)x / (float)Graphics::nScreenWidth) * fFOV;
 
         // Find distance to wall
         float fStepSize = 0.1f; // Increment size for ray casting, decrease to
@@ -58,8 +53,8 @@ void Graphics::renderFrame(std::vector<float> playerPos, std::vector<int> mapDim
         // intersection with a block
         while (!bHitWall && fDistanceToWall < fDepth) {
             fDistanceToWall += fStepSize;
-            int nTestX = (int)(fPlayerX + fEyeX * fDistanceToWall);
-            int nTestY = (int)(fPlayerY + fEyeY * fDistanceToWall);
+            int nTestX = (int)(playerPos.x + fEyeX * fDistanceToWall);
+            int nTestY = (int)(playerPos.y + fEyeY * fDistanceToWall);
 
             // Test if ray is out of bounds
             if (nTestX < 0 || nTestX >= nMapWidth || nTestY < 0 || nTestY >= nMapHeight) {
@@ -85,8 +80,8 @@ void Graphics::renderFrame(std::vector<float> playerPos, std::vector<int> mapDim
                     for (int tx = 0; tx < 2; tx++)
                         for (int ty = 0; ty < 2; ty++) {
                             // Angle of corner to eye
-                            float vy = (float)nTestY + ty - fPlayerY;
-                            float vx = (float)nTestX + tx - fPlayerX;
+                            float vy = (float)nTestY + ty - playerPos.y;
+                            float vx = (float)nTestX + tx - playerPos.x;
                             float d = std::sqrt(vx * vx + vy * vy);
                             float dot = (fEyeX * vx / d) + (fEyeY * vy / d);
                             p.push_back(std::make_pair(d, dot));
@@ -189,19 +184,15 @@ void Graphics::renderFrame(std::vector<float> playerPos, std::vector<int> mapDim
     }
 }
 
-void Graphics::renderHUD(std::vector<float> playerPos, std::vector<int> mapDimensions, std::string map,
+void Graphics::renderHUD(fCoord25D playerPos, std::vector<int> mapDimensions, std::string map,
                          float fElapsedTime) {
-    // Cursed but readable
-    float fPlayerX = playerPos.at(0);
-    float fPlayerY = playerPos.at(1);
-    float fPlayerA = playerPos.at(2);
 
     int nMapHeight = mapDimensions.at(0);
     int nMapWidth = mapDimensions.at(1);
 
     // Display Stats
     wchar_t stats[40];
-    swprintf(stats, 40, L"X=%3.2f, Y=%3.2f, A=%3.2f FPS=%3.2f ", fPlayerX, fPlayerY, fPlayerA, 1.0f / fElapsedTime);
+    swprintf(stats, 40, L"X=%3.2f, Y=%3.2f, A=%3.2f FPS=%3.2f ", playerPos.x, playerPos.y, playerPos.a, 1.0f / fElapsedTime);
     mvaddwstr(0, 0, stats);
 
     // Display Map
@@ -212,7 +203,7 @@ void Graphics::renderHUD(std::vector<float> playerPos, std::vector<int> mapDimen
     }
 
     // Display Player
-    mvaddch((int)fPlayerX + 1, ((int)fPlayerY), 'P');
+    mvaddch((int)playerPos.x + 1, ((int)playerPos.y), 'P');
 }
 
 void Graphics::renderControls() {
