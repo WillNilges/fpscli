@@ -10,7 +10,6 @@ class Player {
 
     fCoord25D stageMovement(action stagedAction, float fElapsedTime);
     void look(action stagedAction, float fElapsedTime);
-    // bool move(int key, std::vector<int> mapDimensions, std::string map, std::vector<char> validWalls, float fElapsedTime);
 
     fCoord25D getPosition();
     void setPosition(fCoord25D newPosition);
