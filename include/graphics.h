@@ -1,4 +1,5 @@
 #include <string>
+#include <array>
 #include <vector>
 #include "types.h"
 
@@ -7,9 +8,9 @@ class Graphics {
   public:
     Graphics(int screenWidth, int screenHeight, float fieldOfView, float depth);
 
-    void renderFrame(fCoord25D playerPos, std::vector<int> mapDimensions, std::string map,
+    void renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions, std::string map,
                      std::vector<char> validWalls);
-    void renderHUD(fCoord25D playerPos, std::vector<int> mapDimensions, std::string map, float fElapsedTime);
+    void renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, std::string map, float fElapsedTime);
     void renderControls();
 
     ~Graphics();

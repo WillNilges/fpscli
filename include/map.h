@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <array>
 #include "types.h"
 
 namespace BitBorn {
@@ -9,7 +10,7 @@ class Map {
 
     // bool checkValidWall(char mapSpace);
     std::string getMap();
-    std::vector<int> getDimensions();
+    std::array<int, 2> getDimensions();
     std::vector<char> getValidWalls();
 
     bool getCollision(fCoord25D coordinates);

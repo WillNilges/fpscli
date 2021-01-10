@@ -28,7 +28,7 @@ Map::Map(std::string mapFilePath, int nMapWidth, int nMapHeight) : nMapWidth(nMa
 
 std::string Map::getMap() { return Map::map; }
 
-std::vector<int> Map::getDimensions() { return {Map::nMapHeight, Map::nMapWidth}; }
+std::array<int, 2> Map::getDimensions() { return {Map::nMapHeight, Map::nMapWidth}; }
 
 std::vector<char> Map::getValidWalls() { return Map::validWalls; }
 

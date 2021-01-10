@@ -29,7 +29,7 @@ Graphics::Graphics(int screenWidth, int screenHeight, float fieldOfView, float d
 }
 
 // Rendering and graphics
-void Graphics::renderFrame(fCoord25D playerPos, std::vector<int> mapDimensions, std::string map, std::vector<char> validWalls) {
+void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions, std::string map, std::vector<char> validWalls) {
 
     // Measure terminal size
     bool cleared = false;
@@ -206,7 +206,7 @@ void Graphics::renderFrame(fCoord25D playerPos, std::vector<int> mapDimensions, 
     }
 }
 
-void Graphics::renderHUD(fCoord25D playerPos, std::vector<int> mapDimensions, std::string map,
+void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, std::string map,
                          float fElapsedTime) {
 
     int nMapHeight = mapDimensions.at(0);

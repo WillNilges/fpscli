@@ -29,7 +29,7 @@ int main() {
     Player player({ 10, 10, 0 }); // Set up the player object
 
     // Acquire map data. Yoink.
-    std::vector<int> mapDimensions = map.getDimensions();
+    std::array<int, 2> mapDimensions = map.getDimensions();
     std::string mapString = map.getMap();
 
     auto tp1 = std::chrono::system_clock::now();
