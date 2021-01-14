@@ -9,25 +9,37 @@
 #include <ncurses.h>
 #include <vector>
 #include <array>
+#include <time.h>
 
 using namespace BitBorn;
 
 bool finished = false;
 bool showHUD = false;
 
+const char KEY_QUIT = 'q';
+const char KEY_SHOW_HUD = 'h';
+const char KEY_RESPAWN = 'p';
 const char KEY_MOVE_FORWARD = 'w';
 const char KEY_MOVE_BACK = 's';
 const char KEY_MOVE_LEFT = 'a';
 const char KEY_MOVE_RIGHT = 'd';
 const char KEY_LOOK_LEFT = 'k';
 const char KEY_LOOK_RIGHT = 'l';
-const char KEY_QUIT = 'q';
-const char KEY_SHOW_HUD = 'h';
 
 int main() {
-    Graphics graphics(120, 40, (3.14159f / 4.0f), 16.0f); // Initialize graphics
     Map map("Map.dat"); // Get the map from a file and instantiate a map object
-    Player player({ 3, 3, 0 }); // Set up the player object
+
+    // Decide where to spawn the player
+    srand ( time(NULL) );
+    std::vector<nCoord2D> possibleSpawns = map.getSpawnLocations();
+    int actualSpawn = rand() % possibleSpawns.size();
+    int newSpawn;
+    float fSpawnX = (float) possibleSpawns.at(actualSpawn).x;
+    float fSpawnY = (float) possibleSpawns.at(actualSpawn).y;
+
+    Player player({ fSpawnY, fSpawnX, 0 }); // Set up the player object
+
+    Graphics graphics(120, 40, (3.14159f / 4.0f), 16.0f); // Initialize graphics
 
     // Acquire map data. Yoink.
     std::array<int, 2> mapDimensions = map.getDimensions();
@@ -56,6 +68,15 @@ int main() {
         case KEY_SHOW_HUD:
             // Toggle hud
             showHUD = !showHUD;
+            break;
+        case KEY_RESPAWN:
+            newSpawn = actualSpawn;
+            while (newSpawn == actualSpawn)
+                newSpawn = rand() % possibleSpawns.size();
+            fSpawnX = (float) possibleSpawns.at(newSpawn).x;
+            fSpawnY = (float) possibleSpawns.at(newSpawn).y;
+            actualSpawn = newSpawn;
+            player.setPosition({fSpawnY, fSpawnX, 0.0});
             break;
         case KEY_MOVE_FORWARD:
             proposedMovement = player.stageMovement(MOVE_FORWARD, fElapsedTime);
