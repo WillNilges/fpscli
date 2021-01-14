@@ -47,6 +47,14 @@ std::vector<char> Map::getValidWalls()         { return Map::validWalls; }
 
 std::vector<nCoord2D> Map::getSpawnLocations() { return Map::spawnLocations; }
 
+fCoord25D Map::getRandomSpawn() {
+    int actualSpawn = rand() % Map::spawnLocations.size();
+    float fSpawnX = (float) Map::spawnLocations.at(actualSpawn).x;
+    float fSpawnY = (float) Map::spawnLocations.at(actualSpawn).y;
+    return { fSpawnY, fSpawnX, 1.0f };
+    
+}
+
 bool Map::getCollision(fCoord25D coordinates) {
     char collisionBlock = map.c_str()[(int)(coordinates.x) * Map::nMapWidth + (int)(coordinates.y)];
 
