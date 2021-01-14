@@ -27,7 +27,7 @@ const char KEY_LOOK_LEFT = 'k';
 const char KEY_LOOK_RIGHT = 'l';
 
 int main() {
-    Map map("Map.dat"); // Get the map from a file and instantiate a map object
+    Map map("walls.dat"); // Get the map from a file and instantiate a map object
 
     // Seed the RNG
     srand ( time(NULL) );

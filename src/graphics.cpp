@@ -226,10 +226,38 @@ void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, 
     for (int nx = 0; nx < minimapDimension; nx++) {
         for (int ny = 0; ny < minimapDimension; ny++) {
             int formula = (yStart+ny) * nMapHeight + (xStart+nx);
-            if ((formula) < 0 || (formula) > map.length() || (xStart+nx) < 0 || (xStart+nx) >= nMapHeight)
+            if ((formula) < 0 || (formula) > map.length() || (xStart+nx) < 0 || (xStart+nx) >= nMapHeight) {
                 mvaddch(ny + 1, nx, ' ');
-            else
-                mvaddch(ny + 1, nx, (chtype)map[formula]);
+            } else {
+                // This code sucks. TODO: Make it not suck as much.
+                char mapBlock = (chtype)map[formula];
+                int color = 1;
+                short character = 0x2588;
+                switch (mapBlock) {
+                case 'W':
+                    break;
+                case 'R':
+                    color = 2;
+                    break;
+                case 'G':
+                    color = 3;
+                    break;
+                case 'B':
+                    color = 4;
+                    break;
+                case 'Y':
+                    color = 5;
+                    break;
+                default:
+                    color = 1;
+                    character = ' ';
+                    break;
+                }
+                attron(COLOR_PAIR(color));
+                wchar_t wstr[] = {character, L'\0'};
+                mvaddwstr(ny+1, nx, wstr);
+                attroff(COLOR_PAIR(color));
+            }
         }
     }
 

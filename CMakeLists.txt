@@ -14,7 +14,7 @@ include_directories( ${CURSES_INCLUDE_DIRS} )
 include_directories( include/ )
 
 # Copy map to build directory
-configure_file(res/Map.dat ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+configure_file(res/walls.dat ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 # Add executable target with source files listed in SOURCES variable
 file(GLOB SOURCES src/*.cpp)
