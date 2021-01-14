@@ -14,11 +14,13 @@ class Map {
     std::string getMap();
     std::array<int, 2> getDimensions();
     std::vector<char> getValidWalls();
+    std::vector<nCoord2D> getSpawnLocations();
 
     bool getCollision(fCoord25D coordinates);
 
   private:
     std::string map;
+    std::vector<nCoord2D> spawnLocations;
     int nMapWidth;
     int nMapHeight;
 

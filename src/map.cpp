@@ -22,22 +22,30 @@ Map::Map(std::string mapFilePath/*, int nMapWidth, int nMapHeight*/) : nMapWidth
     nMapWidth = nMapHeight = 0;
     nMapWidth = map.find('\n'); // The value of i during the first '\n' we find tells us the width.
     for (std::string::size_type i = 0; i < map.size(); i++) {
-        if (map[i] == '\n') {
-            int iterator = ((int) i)-nMapHeight;
+        int iterator = ((int) i)-nMapHeight;
+        switch (map[i]) {
+        case '\n':
             if (iterator % nMapWidth != 0)
-                std::cout << "Map width is wrong. (" << iterator << ") vs (" << nMapWidth << ") ";
+                std::cout << "Map width is wrong. (" << iterator << ") vs (" << nMapWidth << ") \n";
             nMapHeight++; // Increment the map height for each row in the file
+            break;
+        case '*':
+            // If, during our parsing, we encounter an asterisk, then we know that's a spawn point we should keep note of
+            std::cout << "Spawn at (" << (iterator % nMapWidth) << ", " << nMapHeight << ") \n";
+            spawnLocations.push_back({(iterator % nMapWidth), nMapHeight});
+            break;
         }
     }
-
     map.erase(std::remove(map.begin(), map.end(), '\n'), map.end());
 }
 
-std::string Map::getMap() { return Map::map; }
+std::string Map::getMap()                      { return Map::map; }
 
-std::array<int, 2> Map::getDimensions() { return {Map::nMapHeight, Map::nMapWidth}; }
+std::array<int, 2> Map::getDimensions()        { return {Map::nMapHeight, Map::nMapWidth}; }
 
-std::vector<char> Map::getValidWalls() { return Map::validWalls; }
+std::vector<char> Map::getValidWalls()         { return Map::validWalls; }
+
+std::vector<nCoord2D> Map::getSpawnLocations() { return Map::spawnLocations; }
 
 bool Map::getCollision(fCoord25D coordinates) {
     char collisionBlock = map.c_str()[(int)(coordinates.x) * Map::nMapWidth + (int)(coordinates.y)];
