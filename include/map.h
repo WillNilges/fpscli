@@ -1,8 +1,9 @@
 #pragma once
 
 #include "types.h"
-#include <array>
+#include <cmath>
 #include <string>
+#include <array>
 #include <vector>
 
 namespace BitBorn {
@@ -15,6 +16,7 @@ class Map {
     std::array<int, 2> getDimensions();
     std::vector<char> getValidWalls();
     std::vector<nCoord2D> getSpawnLocations();
+    fCoord25D getRandomSpawn();
 
     bool getCollision(fCoord25D coordinates);
 

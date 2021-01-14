@@ -7,8 +7,8 @@
 #include <cmath>
 #include <iostream>
 #include <ncurses.h>
-#include <vector>
 #include <array>
+#include <vector>
 #include <time.h>
 
 using namespace BitBorn;
@@ -29,15 +29,13 @@ const char KEY_LOOK_RIGHT = 'l';
 int main() {
     Map map("Map.dat"); // Get the map from a file and instantiate a map object
 
-    // Decide where to spawn the player
+    // Seed the RNG
     srand ( time(NULL) );
-    std::vector<nCoord2D> possibleSpawns = map.getSpawnLocations();
-    int actualSpawn = rand() % possibleSpawns.size();
-    int newSpawn;
-    float fSpawnX = (float) possibleSpawns.at(actualSpawn).x;
-    float fSpawnY = (float) possibleSpawns.at(actualSpawn).y;
 
-    Player player({ fSpawnY, fSpawnX, 0 }); // Set up the player object
+    fCoord25D currentSpawn = map.getRandomSpawn();
+    fCoord25D nextSpawn = currentSpawn;
+
+    Player player(currentSpawn); // Set up the player object
 
     Graphics graphics(120, 40, (3.14159f / 4.0f), 16.0f); // Initialize graphics
 
@@ -70,13 +68,10 @@ int main() {
             showHUD = !showHUD;
             break;
         case KEY_RESPAWN:
-            newSpawn = actualSpawn;
-            while (newSpawn == actualSpawn)
-                newSpawn = rand() % possibleSpawns.size();
-            fSpawnX = (float) possibleSpawns.at(newSpawn).x;
-            fSpawnY = (float) possibleSpawns.at(newSpawn).y;
-            actualSpawn = newSpawn;
-            player.setPosition({fSpawnY, fSpawnX, 0.0});
+            while (nextSpawn.x == currentSpawn.x && nextSpawn.y == currentSpawn.y)
+                nextSpawn = map.getRandomSpawn();
+            player.setPosition(nextSpawn);
+            currentSpawn = nextSpawn;
             break;
         case KEY_MOVE_FORWARD:
             proposedMovement = player.stageMovement(MOVE_FORWARD, fElapsedTime);
