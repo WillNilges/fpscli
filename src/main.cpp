@@ -68,6 +68,7 @@ int main() {
             showHUD = !showHUD;
             break;
         case KEY_RESPAWN:
+            // Don't want the player to re-spawn at their old location.
             while (nextSpawn.x == currentSpawn.x && nextSpawn.y == currentSpawn.y)
                 nextSpawn = map.getRandomSpawn();
             player.setPosition(nextSpawn);
