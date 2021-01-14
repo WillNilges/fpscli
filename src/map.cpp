@@ -32,7 +32,7 @@ Map::Map(std::string mapFilePath/*, int nMapWidth, int nMapHeight*/) : nMapWidth
         case '*':
             // If, during our parsing, we encounter an asterisk, then we know that's a spawn point we should keep note of
             std::cout << "Spawn at (" << (iterator % nMapWidth) << ", " << nMapHeight << ") \n";
-            spawnLocations.push_back({(iterator % nMapWidth), nMapHeight});
+            spawnLocations.push_back({nMapHeight, (iterator % nMapWidth)}); // Remember that ncurses coords are reversed and so are the coords for this whole game™, so the height is first, and the width is second.
             break;
         }
     }
@@ -51,7 +51,7 @@ fCoord25D Map::getRandomSpawn() {
     int actualSpawn = rand() % Map::spawnLocations.size();
     float fSpawnX = (float) Map::spawnLocations.at(actualSpawn).x;
     float fSpawnY = (float) Map::spawnLocations.at(actualSpawn).y;
-    return { fSpawnY, fSpawnX, 1.0f };
+    return { fSpawnX, fSpawnY, 1.0f };
     
 }
 
