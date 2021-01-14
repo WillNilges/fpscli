@@ -26,6 +26,10 @@ Graphics::Graphics(int screenWidth, int screenHeight, float fieldOfView, float d
     init_pair(3, COLOR_GREEN, COLOR_BLACK);  // 'G'
     init_pair(4, COLOR_BLUE, COLOR_BLACK);   // 'B'
     init_pair(5, COLOR_YELLOW, COLOR_BLACK); // 'Y'
+
+    // The sky
+    init_color(COLOR_MAGENTA, 320, 675, 825);
+    init_pair(14, COLOR_MAGENTA, COLOR_MAGENTA);
 }
 
 // Rendering and graphics
@@ -69,7 +73,7 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
         float fEyeX = sinf(fRayAngle); // Unit vector for ray in player space
         float fEyeY = cosf(fRayAngle);
 
-        // Work out what kind of block it is
+        // We will need to work out what kind of block it is
         char wallBlock;
 
         // Incrementally cast ray from player, along ray angle, testing for
@@ -97,9 +101,9 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
                     // boundary, which we'll shade to add detail to the walls
                     std::vector<std::pair<float, float>> p;
 
-                    // Test each corner of hit tile, storing the distance from
-                    // the player, and the calculated dot product of the two
-                    // rays
+                    // Test each corner of hit tile (top down view), storing the
+                    // distance from the player, and the calculated dot product
+                    // of the two rays
                     for (int tx = 0; tx < 2; tx++)
                         for (int ty = 0; ty < 2; ty++) {
                             // Angle of corner to eye
@@ -128,14 +132,13 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
             }
         }
 
-        // Calculate distance to ceiling and floor
+        // Calculate distance to ceiling and floor (Really just how much of the
+        // ceiling you can see).
         int nCeiling =
             (int)((float)(Graphics::nScreenHeight / 2.0) - Graphics::nScreenHeight / ((float)fDistanceToWall));
         int nFloor = Graphics::nScreenHeight - nCeiling;
 
-        // Shader walls based on distance and material
-        // If you add a new block type, you must code in how you want it to be
-        // rendered.
+        // Shader walls based on distance
         short nShade = ' ';
         if (fDistanceToWall <= fDepth / 4.0f)
             nShade = 0x2588; // Very close
@@ -175,18 +178,18 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
 
         for (int y = 0; y < Graphics::nScreenHeight; y++) {
             // Each Section of the world
-            if (y <= nCeiling) // Ceiling
-            {
-                mvaddch(y, x, ' ');
-            } else if (y > nCeiling && y <= nFloor) // Walls
-            {
+            if (y <= nCeiling) {
+                // The ceiling is black.
+                attron(COLOR_PAIR(color));
+                mvaddch(y, x, '.');
+                attroff(COLOR_PAIR(color));
+            } else if (y > nCeiling && y <= nFloor) {
+                // Render a chunk of the wall
                 attron(COLOR_PAIR(color));
                 wchar_t wstr[] = {nShade, L'\0'};
                 mvaddwstr(y, x, wstr);
                 attroff(COLOR_PAIR(color));
-
-            } else // Floor
-            {
+            } else {
                 // Shade floor based on distance
                 float b =
                     1.0f - (((float)y - Graphics::nScreenHeight / 2.0f) / ((float)Graphics::nScreenHeight / 2.0f));
@@ -204,6 +207,24 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
                 mvaddwstr(y, x, wstr);
             }
         }
+
+        // Work out how to paint the ceiling
+        float fDistanceToSky = 0.0f;
+        for (int i = 0; i < nCeiling; i++) {
+            fDistanceToSky += fStepSize;
+            int nTestX = (int)(playerPos.x + fEyeX * fDistanceToSky);
+            int nTestY = (int)(playerPos.y + fEyeY * fDistanceToSky);
+            char skyBlock = map.c_str()[nTestX * nMapWidth + nTestY];
+            switch (skyBlock) {
+            case ' ':
+                mvaddch(i, x, 'A');
+                break;
+            case '.':
+                mvaddch(i, x, 'B');
+                break;
+            }
+        }
+
     }
 }
 
@@ -229,7 +250,8 @@ void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, 
             if ((formula) < 0 || (formula) > map.length() || (xStart+nx) < 0 || (xStart+nx) >= nMapHeight) {
                 mvaddch(ny + 1, nx, ' ');
             } else {
-                // This code sucks. TODO: Make it not suck as much.
+                // This code sucks.
+                // TODO: Make it not suck as much.
                 char mapBlock = (chtype)map[formula];
                 int color = 1;
                 short character = 0x2588;
