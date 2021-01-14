@@ -8,7 +8,7 @@
 namespace BitBorn {
 class Map {
   public:
-    Map(std::string mapFilePath, int nMapWidth, int nMapHeight);
+    Map(std::string mapFilePath);
 
     // bool checkValidWall(char mapSpace);
     std::string getMap();

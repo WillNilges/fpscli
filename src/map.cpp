@@ -8,15 +8,28 @@
 
 using namespace BitBorn;
 
-Map::Map(std::string mapFilePath, int nMapWidth, int nMapHeight) : nMapWidth(nMapWidth), nMapHeight(nMapHeight) {
+Map::Map(std::string mapFilePath/*, int nMapWidth, int nMapHeight*/) : nMapWidth(nMapWidth), nMapHeight(nMapHeight) {
     std::ifstream mapFile{mapFilePath};
     if (!mapFile) {
         endwin();
         std::cerr << "Error. Cannot open map file. Does it actually exist?" << std::endl;
     }
-    std::ostringstream sstr;
-    sstr << mapFile.rdbuf();
-    map = sstr.str();
+    std::ostringstream sRawMap;
+    sRawMap << mapFile.rdbuf();
+    map = sRawMap.str();
+
+    // Work out the width and height of the map
+    nMapWidth = nMapHeight = 0;
+    nMapWidth = map.find('\n'); // The value of i during the first '\n' we find tells us the width.
+    for (std::string::size_type i = 0; i < map.size(); i++) {
+        if (map[i] == '\n') {
+            int iterator = ((int) i)-nMapHeight;
+            if (iterator % nMapWidth != 0)
+                std::cout << "Map width is wrong. (" << iterator << ") vs (" << nMapWidth << ") ";
+            nMapHeight++; // Increment the map height for each row in the file
+        }
+    }
+
     map.erase(std::remove(map.begin(), map.end(), '\n'), map.end());
 }
 
