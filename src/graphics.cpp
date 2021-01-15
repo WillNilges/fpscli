@@ -177,32 +177,16 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
             nShade = ' '; // Draw a seam between wall blocks
 
         for (int y = 0; y < Graphics::nScreenHeight; y++) {
-            // Each Section of the world
+            // Clear out the ceiling and floor
             if (y <= nCeiling) {
-                // The ceiling is black.
-                attron(COLOR_PAIR(color));
                 mvaddch(y, x, ' ');
-                attroff(COLOR_PAIR(color));
             } else if (y > nCeiling && y <= nFloor) {
                 // Render a chunk of the wall
                 attron(COLOR_PAIR(color));
                 wchar_t wstr[] = {nShade, L'\0'};
                 mvaddwstr(y, x, wstr);
                 attroff(COLOR_PAIR(color));
-            }
-             else {
-                // Shade floor based on distance
-                // float b =
-                //     1.0f - (((float)y - Graphics::nScreenHeight / 2.0f) / ((float)Graphics::nScreenHeight / 2.0f));
-                // if (b < 0.25)
-                //     nShade = '#';
-                // else if (b < 0.5)
-                //     nShade = 'x';
-                // else if (b < 0.75)
-                //     nShade = '.';
-                // else if (b < 0.9)
-                //     nShade = '-';
-                // else
+            } else {
                 nShade = ' ';
                 wchar_t wstr[] = {nShade, L'\0'};
                 mvaddwstr(y, x, wstr);
@@ -239,7 +223,6 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
             short floorShade = 0x2588;
             
             float b = 1.0f - (((float)i - Graphics::nScreenHeight / 2.0f) / ((float)Graphics::nScreenHeight / 2.0f));
-
             if (b < 0.25)
                 floorShade = 0x2588;
             else if (b < 0.5)
@@ -260,19 +243,9 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
                 attroff(COLOR_PAIR(3));
                 break;
             case '.':
-                // Shade floor based on distance
-                if (b < 0.25)
-                    nShade = '#';
-                else if (b < 0.5)
-                    nShade = 'x';
-                else if (b < 0.75)
-                    nShade = '.';
-                else if (b < 0.9)
-                    nShade = '-';
-                else
-                    nShade = ' ';
-                wchar_t wstr[] = {nShade, L'\0'};
-                mvaddwstr(i, x, wstr);
+                attron(COLOR_PAIR(4));
+                mvaddwstr(i, x, floorChar);
+                attroff(COLOR_PAIR(4));
                 break;
             }
         }
