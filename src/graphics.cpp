@@ -181,7 +181,7 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
             if (y <= nCeiling) {
                 // The ceiling is black.
                 attron(COLOR_PAIR(color));
-                mvaddch(y, x, '.');
+                mvaddch(y, x, ' ');
                 attroff(COLOR_PAIR(color));
             } else if (y > nCeiling && y <= nFloor) {
                 // Render a chunk of the wall
@@ -211,16 +211,20 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
         // Work out how to paint the ceiling
         float fDistanceToSky = 0.0f;
         for (int i = 0; i < nCeiling; i++) {
-            fDistanceToSky += fStepSize;
+            fDistanceToSky += fStepSize*4;
             int nTestX = (int)(playerPos.x + fEyeX * fDistanceToSky);
             int nTestY = (int)(playerPos.y + fEyeY * fDistanceToSky);
             char skyBlock = map.c_str()[nTestX * nMapWidth + nTestY];
+            wchar_t skyChar[] = {0x2588, L'\0'};
             switch (skyBlock) {
             case ' ':
-                mvaddch(i, x, 'A');
+                // mvaddch(i, x, 'A');
+                attron(COLOR_PAIR(14));
+                mvaddwstr(i, x, skyChar);
+                attroff(COLOR_PAIR(14));
                 break;
             case '.':
-                mvaddch(i, x, 'B');
+                mvaddch(i, x, ' ');
                 break;
             }
         }
