@@ -218,13 +218,32 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
             wchar_t skyChar[] = {0x2588, L'\0'};
             switch (skyBlock) {
             case ' ':
-                // mvaddch(i, x, 'A');
                 attron(COLOR_PAIR(14));
                 mvaddwstr(i, x, skyChar);
                 attroff(COLOR_PAIR(14));
                 break;
             case '.':
                 mvaddch(i, x, ' ');
+                break;
+            }
+        }
+
+        //While we're at it, let's paint the floor.
+        float fDistanceToFloor = 0.0f;
+        for (int i = terminalHeight; i > nFloor; i--) {
+            fDistanceToFloor += fStepSize*4;
+            int nTestX = (int)(playerPos.x + fEyeX * fDistanceToFloor);
+            int nTestY = (int)(playerPos.y + fEyeY * fDistanceToFloor);
+            char floorBlock = map.c_str()[nTestX * nMapWidth + nTestY];
+            wchar_t floorChar[] = {0x2588, L'\0'};
+            switch (floorBlock) {
+            case ' ':
+                attron(COLOR_PAIR(3));
+                mvaddwstr(i, x, floorChar);
+                attroff(COLOR_PAIR(3));
+                break;
+            case '.':
+                mvaddch(i, x, '.');
                 break;
             }
         }
