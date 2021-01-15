@@ -27,5 +27,6 @@ class Map {
     int nMapHeight;
 
     std::vector<char> validWalls{'W', 'R', 'G', 'B', 'Y'};
+    std::vector<char> validOpen{'.', ' '};
 };
 } // namespace BitBorn
