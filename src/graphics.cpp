@@ -189,20 +189,21 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
                 wchar_t wstr[] = {nShade, L'\0'};
                 mvaddwstr(y, x, wstr);
                 attroff(COLOR_PAIR(color));
-            } else {
+            }
+             else {
                 // Shade floor based on distance
-                float b =
-                    1.0f - (((float)y - Graphics::nScreenHeight / 2.0f) / ((float)Graphics::nScreenHeight / 2.0f));
-                if (b < 0.25)
-                    nShade = '#';
-                else if (b < 0.5)
-                    nShade = 'x';
-                else if (b < 0.75)
-                    nShade = '.';
-                else if (b < 0.9)
-                    nShade = '-';
-                else
-                    nShade = ' ';
+                // float b =
+                //     1.0f - (((float)y - Graphics::nScreenHeight / 2.0f) / ((float)Graphics::nScreenHeight / 2.0f));
+                // if (b < 0.25)
+                //     nShade = '#';
+                // else if (b < 0.5)
+                //     nShade = 'x';
+                // else if (b < 0.75)
+                //     nShade = '.';
+                // else if (b < 0.9)
+                //     nShade = '-';
+                // else
+                nShade = ' ';
                 wchar_t wstr[] = {nShade, L'\0'};
                 mvaddwstr(y, x, wstr);
             }
@@ -235,7 +236,23 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
             int nTestX = (int)(playerPos.x + fEyeX * fDistanceToFloor);
             int nTestY = (int)(playerPos.y + fEyeY * fDistanceToFloor);
             char floorBlock = map.c_str()[nTestX * nMapWidth + nTestY];
-            wchar_t floorChar[] = {0x2588, L'\0'};
+            short floorShade = 0x2588;
+            
+            float b = 1.0f - (((float)i - Graphics::nScreenHeight / 2.0f) / ((float)Graphics::nScreenHeight / 2.0f));
+
+            if (b < 0.25)
+                floorShade = 0x2588;
+            else if (b < 0.5)
+                floorShade = 0x2593;
+            else if (b < 0.75)
+                floorShade = 0x2592;
+            else if (b < 0.9)
+                floorShade = 0x2591;
+            else
+                floorShade = ' ';
+
+            wchar_t floorChar[] = {floorShade, L'\0'};
+
             switch (floorBlock) {
             case ' ':
                 attron(COLOR_PAIR(3));
@@ -243,7 +260,19 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
                 attroff(COLOR_PAIR(3));
                 break;
             case '.':
-                mvaddch(i, x, '.');
+                // Shade floor based on distance
+                if (b < 0.25)
+                    nShade = '#';
+                else if (b < 0.5)
+                    nShade = 'x';
+                else if (b < 0.75)
+                    nShade = '.';
+                else if (b < 0.9)
+                    nShade = '-';
+                else
+                    nShade = ' ';
+                wchar_t wstr[] = {nShade, L'\0'};
+                mvaddwstr(i, x, wstr);
                 break;
             }
         }
