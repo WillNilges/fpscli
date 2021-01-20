@@ -37,7 +37,7 @@ int main() {
 
     Player player(currentSpawn); // Set up the player object
 
-    Graphics graphics(120, 40, (3.14159f / 4.0f), 16.0f); // Initialize graphics
+    Graphics graphics(120, 40, (3.14159f / 4.0f), 32.0f); // Initialize graphics
 
     // Acquire map data. Yoink.
     std::array<int, 2> mapDimensions = map.getDimensions();
