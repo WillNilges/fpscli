@@ -18,6 +18,12 @@ class Graphics {
     ~Graphics();
 
   private:
+    const short BRIGHTEST = 0x2588;
+    const short BRIGHTER = 0x2593;
+    const short DIM = 0x2592;
+    const short DARKER = 0x2591;
+    const short DARKEST = 0x2591;
+
     int terminalWidth;
     int terminalHeight;
 

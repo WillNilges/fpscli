@@ -28,8 +28,10 @@ Graphics::Graphics(int screenWidth, int screenHeight, float fieldOfView, float d
     init_pair(5, COLOR_YELLOW, COLOR_BLACK); // 'Y'
 
     // The sky
-    init_color(COLOR_MAGENTA, 320, 675, 825);
-    init_pair(14, COLOR_MAGENTA, COLOR_MAGENTA);
+    // init_color(COLOR_MAGENTA, 320, 675, 825);
+    init_pair(14, COLOR_CYAN, COLOR_CYAN);
+    init_pair(141, COLOR_CYAN, COLOR_BLACK);
+    init_pair(142, COLOR_MAGENTA, COLOR_MAGENTA);
 }
 
 // Rendering and graphics
@@ -141,15 +143,15 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
         // Shader walls based on distance
         short nShade = ' ';
         if (fDistanceToWall <= fDepth / 4.0f)
-            nShade = 0x2588; // Very close
+            nShade = Graphics::BRIGHTEST; // Very close
         else if (fDistanceToWall < fDepth / 3.0f)
-            nShade = 0x2593;
+            nShade = Graphics::BRIGHTER;
         else if (fDistanceToWall < fDepth / 2.0f)
-            nShade = 0x2592;
+            nShade = Graphics::DIM;
         else if (fDistanceToWall < fDepth)
-            nShade = 0x2591;
+            nShade = Graphics::DARKER;
         else
-            nShade = ' '; // Too far away
+            nShade = Graphics::DARKEST; // Too far away
 
         // Decide which color to use for the wall, should it exist.
         int color = 1;
@@ -179,7 +181,7 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
         for (int y = 0; y < Graphics::nScreenHeight; y++) {
             // Clear out the ceiling and floor
             if (y <= nCeiling) {
-                mvaddch(y, x, ' ');
+                mvaddch(y, x, Graphics::DARKEST);
             } else if (y > nCeiling && y <= nFloor) {
                 // Render a chunk of the wall
                 attron(COLOR_PAIR(color));
@@ -187,7 +189,7 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
                 mvaddwstr(y, x, wstr);
                 attroff(COLOR_PAIR(color));
             } else {
-                nShade = ' ';
+                nShade = Graphics::DARKEST;
                 wchar_t wstr[] = {nShade, L'\0'};
                 mvaddwstr(y, x, wstr);
             }
@@ -200,52 +202,79 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
             int nTestX = (int)(playerPos.x + fEyeX * fDistanceToSky);
             int nTestY = (int)(playerPos.y + fEyeY * fDistanceToSky);
             char skyBlock = map.c_str()[nTestX * nMapWidth + nTestY];
-            wchar_t skyChar[] = {0x2588, L'\0'};
+
+            short tileShade = 0x2588;
+            
+            // This is a dumb formula.
+            float b = 1 + (((float)i - Graphics::nScreenHeight / 2.0f) / ((float)Graphics::nScreenHeight / 2.0f));
+            if (b < 0.25)
+                tileShade = Graphics::BRIGHTEST;
+            else if (b < 0.5)
+                tileShade = Graphics::BRIGHTER;
+            else if (b < 0.75)
+                tileShade = Graphics::DIM;
+            else if (b < 0.9)
+                tileShade = Graphics::DARKER;
+            else
+                tileShade = Graphics::DARKEST;
+
+            wchar_t ceilingChar[] = {tileShade, L'\0'};
+            
             switch (skyBlock) {
-            case ' ':
-                attron(COLOR_PAIR(14));
-                mvaddwstr(i, x, skyChar);
-                attroff(COLOR_PAIR(14));
-                break;
             case '.':
-                mvaddch(i, x, ' ');
+                mvaddwstr(i, x, ceilingChar);
+                break;
+            case '*':
+                attron(COLOR_PAIR(142));
+                mvaddwstr(i, x, ceilingChar);
+                attroff(COLOR_PAIR(142));
+                break;
+            default:
+                attron(COLOR_PAIR(14));
+                mvaddwstr(i, x, ceilingChar);
+                attroff(COLOR_PAIR(14));
                 break;
             }
         }
 
         //While we're at it, let's paint the floor.
         float fDistanceToFloor = 0.0f;
-        for (int i = terminalHeight; i > nFloor; i--) {
+        for (int i = Graphics::nScreenHeight; i > nFloor; i--) {
             fDistanceToFloor += fStepSize*4;
             int nTestX = (int)(playerPos.x + fEyeX * fDistanceToFloor);
             int nTestY = (int)(playerPos.y + fEyeY * fDistanceToFloor);
             char floorBlock = map.c_str()[nTestX * nMapWidth + nTestY];
-            short floorShade = 0x2588;
+            short tileShade = 0x2588;
             
             float b = 1.0f - (((float)i - Graphics::nScreenHeight / 2.0f) / ((float)Graphics::nScreenHeight / 2.0f));
             if (b < 0.25)
-                floorShade = 0x2588;
+                tileShade = Graphics::BRIGHTEST;
             else if (b < 0.5)
-                floorShade = 0x2593;
+                tileShade = Graphics::BRIGHTER;
             else if (b < 0.75)
-                floorShade = 0x2592;
+                tileShade = Graphics::DIM;
             else if (b < 0.9)
-                floorShade = 0x2591;
+                tileShade = Graphics::DARKER;
             else
-                floorShade = ' ';
+                tileShade = Graphics::DARKEST;
 
-            wchar_t floorChar[] = {floorShade, L'\0'};
-
+            wchar_t floorChar[] = {tileShade, L'\0'};
             switch (floorBlock) {
-            case ' ':
-                attron(COLOR_PAIR(3));
-                mvaddwstr(i, x, floorChar);
-                attroff(COLOR_PAIR(3));
-                break;
             case '.':
                 attron(COLOR_PAIR(4));
                 mvaddwstr(i, x, floorChar);
                 attroff(COLOR_PAIR(4));
+                break;
+            case '*':
+                attron(COLOR_PAIR(142));
+                mvaddwstr(i, x, floorChar);
+                attroff(COLOR_PAIR(142));
+                break;
+            default:
+                attron(COLOR_PAIR(3));
+                floorChar[0] = 0x2588;
+                mvaddwstr(i, x, floorChar);
+                attroff(COLOR_PAIR(3));
                 break;
             }
         }
