@@ -41,7 +41,7 @@ class Graphics {
     int nScreenWidth{120};
     int nScreenHeight{40};
     float fFOV{3.14159f / 4.0f};
-    float fDepth{16.0f};
+    float fDepth{32.0f};
 
     bool showHUD{false};
 };
