@@ -24,6 +24,17 @@ class Graphics {
     const short DARKER = 0x2591;
     const short DARKEST = 0x2591;
 
+    enum ColorPallete {
+        WHITE,
+        RED,
+        GREEN,
+        BLUE,
+        YELLOW,
+        SKY,
+        TRUE_SKY,
+        SPAWN
+    };
+
     int terminalWidth;
     int terminalHeight;
 

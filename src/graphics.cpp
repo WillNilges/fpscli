@@ -21,17 +21,19 @@ Graphics::Graphics(int screenWidth, int screenHeight, float fieldOfView, float d
 
     // Colors!
     start_color();
-    init_pair(1, COLOR_WHITE, COLOR_BLACK);  // 'W'
-    init_pair(2, COLOR_RED, COLOR_BLACK);    // 'R'
-    init_pair(3, COLOR_GREEN, COLOR_BLACK);  // 'G'
-    init_pair(4, COLOR_BLUE, COLOR_BLACK);   // 'B'
-    init_pair(5, COLOR_YELLOW, COLOR_BLACK); // 'Y'
+    init_pair(WHITE,  COLOR_WHITE,  COLOR_BLACK);  // 'W'
+    init_pair(RED,    COLOR_RED,    COLOR_BLACK);    // 'R'
+    init_pair(GREEN,  COLOR_GREEN,  COLOR_BLACK);  // 'G'
+    init_pair(BLUE,   COLOR_BLUE,   COLOR_BLACK);   // 'B'
+    init_pair(YELLOW, COLOR_YELLOW, COLOR_BLACK); // 'Y'
 
     // The sky
     // init_color(COLOR_MAGENTA, 320, 675, 825);
-    init_pair(14, COLOR_CYAN, COLOR_CYAN);
-    init_pair(141, COLOR_CYAN, COLOR_BLACK);
-    init_pair(142, COLOR_MAGENTA, COLOR_MAGENTA);
+    init_pair(TRUE_SKY, COLOR_CYAN,    COLOR_CYAN);
+    init_pair(SKY,      COLOR_CYAN,    COLOR_BLACK);
+
+    // Other things
+    init_pair(SPAWN,    COLOR_MAGENTA, COLOR_MAGENTA);
 }
 
 // Rendering and graphics
@@ -60,9 +62,9 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
     int nMapHeight = mapDimensions.at(0);
     int nMapWidth = mapDimensions.at(1);
 
-    for (int x = 0; x < Graphics::nScreenWidth; x++) {
+    for (int x = 0; x < nScreenWidth; x++) {
         // For each column, calculate the projected ray angle into world space
-        float fRayAngle = (playerPos.a - fFOV / 2.0f) + ((float)x / (float)Graphics::nScreenWidth) * fFOV;
+        float fRayAngle = (playerPos.a - fFOV / 2.0f) + ((float)x / (float)nScreenWidth) * fFOV;
 
         // Find distance to wall
         float fStepSize = 0.1f; // Increment size for ray casting, decrease to
@@ -137,51 +139,51 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
         // Calculate distance to ceiling and floor (Really just how much of the
         // ceiling you can see).
         int nCeiling =
-            (int)((float)(Graphics::nScreenHeight / 2.0) - Graphics::nScreenHeight / ((float)fDistanceToWall));
-        int nFloor = Graphics::nScreenHeight - nCeiling;
+            (int)((float)(nScreenHeight / 2.0) - nScreenHeight / ((float)fDistanceToWall));
+        int nFloor = nScreenHeight - nCeiling;
 
         // Shader walls based on distance
         short nShade = ' ';
         if (fDistanceToWall <= fDepth / 4.0f)
-            nShade = Graphics::BRIGHTEST; // Very close
+            nShade = BRIGHTEST; // Very close
         else if (fDistanceToWall < fDepth / 3.0f)
-            nShade = Graphics::BRIGHTER;
+            nShade = BRIGHTER;
         else if (fDistanceToWall < fDepth / 2.0f)
-            nShade = Graphics::DIM;
+            nShade = DIM;
         else if (fDistanceToWall < fDepth)
-            nShade = Graphics::DARKER;
+            nShade = DARKER;
         else
-            nShade = Graphics::DARKEST; // Too far away
+            nShade = DARKEST; // Too far away
 
         // Decide which color to use for the wall, should it exist.
-        int color = 1;
+        int color = WHITE;
         switch (wallBlock) {
         case 'W':
             break;
         case 'R':
-            color = 2;
+            color = RED;
             break;
         case 'G':
-            color = 3;
+            color = GREEN;
             break;
         case 'B':
-            color = 4;
+            color = BLUE;
             break;
         case 'Y':
-            color = 5;
+            color = YELLOW;
             break;
         default:
-            color = 1;
+            color = WHITE;
             break;
         }
 
         if (bBoundary)
             nShade = ' '; // Draw a seam between wall blocks
 
-        for (int y = 0; y < Graphics::nScreenHeight; y++) {
+        for (int y = 0; y < nScreenHeight; y++) {
             // Clear out the ceiling and floor
             if (y <= nCeiling) {
-                mvaddch(y, x, Graphics::DARKEST);
+                mvaddch(y, x, DARKEST);
             } else if (y > nCeiling && y <= nFloor) {
                 // Render a chunk of the wall
                 attron(COLOR_PAIR(color));
@@ -189,7 +191,7 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
                 mvaddwstr(y, x, wstr);
                 attroff(COLOR_PAIR(color));
             } else {
-                nShade = Graphics::DARKEST;
+                nShade = DARKEST;
                 wchar_t wstr[] = {nShade, L'\0'};
                 mvaddwstr(y, x, wstr);
             }
@@ -201,84 +203,83 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
             fDistanceToSky += fStepSize*4;
             int nTestX = (int)(playerPos.x + fEyeX * fDistanceToSky);
             int nTestY = (int)(playerPos.y + fEyeY * fDistanceToSky);
-            char skyBlock = map.c_str()[nTestX * nMapWidth + nTestY];
+            char ceilingBlock = map.c_str()[nTestX * nMapWidth + nTestY];
 
-            short tileShade = Graphics::BRIGHTEST;
+            short tileShade = BRIGHTEST;
             
             // This is a dumb formula.
-            float b = 1 + (((float)i - Graphics::nScreenHeight / 2.0f) / ((float)Graphics::nScreenHeight / 2.0f));
+            float b = 1 + (((float)i - nScreenHeight / 2.0f) / ((float)nScreenHeight / 2.0f));
             if (b < 0.25)
-                tileShade = Graphics::BRIGHTEST;
+                tileShade = BRIGHTEST;
             else if (b < 0.5)
-                tileShade = Graphics::BRIGHTER;
+                tileShade = BRIGHTER;
             else if (b < 0.75)
-                tileShade = Graphics::DIM;
+                tileShade = DIM;
             else if (b < 0.9)
-                tileShade = Graphics::DARKER;
+                tileShade = DARKER;
             else
-                tileShade = Graphics::DARKEST;
+                tileShade = DARKEST;
 
             wchar_t ceilingChar[] = {tileShade, L'\0'};
             
-            switch (skyBlock) {
+            switch (ceilingBlock) {
             case '.':
                 mvaddwstr(i, x, ceilingChar);
                 break;
             case '*':
-                attron(COLOR_PAIR(142));
+                attron(COLOR_PAIR(SPAWN));
                 mvaddwstr(i, x, ceilingChar);
-                attroff(COLOR_PAIR(142));
+                attroff(COLOR_PAIR(SPAWN));
                 break;
             default:
-                attron(COLOR_PAIR(14));
+                attron(COLOR_PAIR(TRUE_SKY));
                 mvaddwstr(i, x, ceilingChar);
-                attroff(COLOR_PAIR(14));
+                attroff(COLOR_PAIR(TRUE_SKY));
                 break;
             }
         }
 
         //While we're at it, let's paint the floor.
         float fDistanceToFloor = 0.0f;
-        for (int i = Graphics::nScreenHeight; i > nFloor; i--) {
+        for (int i = nScreenHeight; i > nFloor; i--) {
             fDistanceToFloor += fStepSize*4;
             int nTestX = (int)(playerPos.x + fEyeX * fDistanceToFloor);
             int nTestY = (int)(playerPos.y + fEyeY * fDistanceToFloor);
             char floorBlock = map.c_str()[nTestX * nMapWidth + nTestY];
-            short tileShade = Graphics::BRIGHTEST;
+            short tileShade = BRIGHTEST;
             
-            float b = 1.0f - (((float)i - Graphics::nScreenHeight / 2.0f) / ((float)Graphics::nScreenHeight / 2.0f));
+            float b = 1.0f - (((float)i - nScreenHeight / 2.0f) / ((float)nScreenHeight / 2.0f));
             if (b < 0.25)
-                tileShade = Graphics::BRIGHTEST;
+                tileShade = BRIGHTEST;
             else if (b < 0.5)
-                tileShade = Graphics::BRIGHTER;
+                tileShade = BRIGHTER;
             else if (b < 0.75)
-                tileShade = Graphics::DIM;
+                tileShade = DIM;
             else if (b < 0.9)
-                tileShade = Graphics::DARKER;
+                tileShade = DARKER;
             else
-                tileShade = Graphics::DARKEST;
+                tileShade = DARKEST;
 
             wchar_t floorChar[] = {tileShade, L'\0'};
             switch (floorBlock) {
             case '.':
-                attron(COLOR_PAIR(4));
+                attron(COLOR_PAIR(BLUE));
                 mvaddwstr(i, x, floorChar);
-                attroff(COLOR_PAIR(4));
+                attroff(COLOR_PAIR(BLUE));
                 break;
             case '*':
-                attron(COLOR_PAIR(142));
+                attron(COLOR_PAIR(SPAWN));
                 mvaddwstr(i, x, floorChar);
-                attroff(COLOR_PAIR(142));
+                attroff(COLOR_PAIR(SPAWN));
                 break;
             default:
-                attron(COLOR_PAIR(3));
-                floorChar[0] = Graphics::BRIGHTEST;
+                attron(COLOR_PAIR(GREEN));
+                floorChar[0] = BRIGHTEST;
                 mvaddwstr(i, x, floorChar);
-                attroff(COLOR_PAIR(3));
+                attroff(COLOR_PAIR(GREEN));
                 break;
             }
         }
-
     }
 }
 
@@ -300,32 +301,32 @@ void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, 
 
     for (int nx = 0; nx < minimapDimension; nx++) {
         for (int ny = 0; ny < minimapDimension; ny++) {
-            int formula = (yStart+ny) * nMapHeight + (xStart+nx);
-            if ((formula) < 0 || (formula) > map.length() || (xStart+nx) < 0 || (xStart+nx) >= nMapHeight) {
+            int mapIndex = (yStart+ny) * nMapHeight + (xStart+nx);
+            if ((mapIndex) < 0 || (mapIndex) > map.length() || (xStart+nx) < 0 || (xStart+nx) >= nMapHeight) {
                 mvaddch(ny + 1, nx, ' ');
             } else {
                 // This code sucks.
                 // TODO: Make it not suck as much.
-                char mapBlock = (chtype)map[formula];
-                int color = 1;
-                short character = Graphics::BRIGHTEST;
+                char mapBlock = (chtype)map[mapIndex];
+                int color = WHITE;
+                short character = BRIGHTEST;
                 switch (mapBlock) {
                 case 'W':
                     break;
                 case 'R':
-                    color = 2;
+                    color = RED;
                     break;
                 case 'G':
-                    color = 3;
+                    color = GREEN;
                     break;
                 case 'B':
-                    color = 4;
+                    color = BLUE;
                     break;
                 case 'Y':
-                    color = 5;
+                    color = YELLOW;
                     break;
                 default:
-                    color = 1;
+                    color = WHITE;
                     character = ' ';
                     break;
                 }
@@ -338,16 +339,16 @@ void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, 
     }
 
     // Display Player
-    attron(COLOR_PAIR(2));
+    attron(COLOR_PAIR(RED));
     mvaddch((minimapDimension/2)+1, (minimapDimension/2), 'P');
-    attroff(COLOR_PAIR(2));
+    attroff(COLOR_PAIR(RED));
 }
 
 void Graphics::renderControls() {
     // Display controls
     wchar_t instructions[40] = L"wsad=Move, kl=look, q=quit, h=HUD";
     attron(A_BOLD);
-    mvaddwstr(Graphics::nScreenHeight - 1, 0, instructions);
+    mvaddwstr(nScreenHeight - 1, 0, instructions);
     attroff(A_BOLD);
 }
 
