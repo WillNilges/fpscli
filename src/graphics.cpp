@@ -183,7 +183,7 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
         for (int y = 0; y < nScreenHeight; y++) {
             // Clear out the ceiling and floor
             if (y <= nCeiling) {
-                mvaddch(y, x, DARKEST);
+                mvaddch(y, x, ' ');
             } else if (y > nCeiling && y <= nFloor) {
                 // Render a chunk of the wall
                 attron(COLOR_PAIR(color));
@@ -198,11 +198,11 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
         }
 
         // Work out how to paint the ceiling
-        float fDistanceToSky = 0.0f;
+        float fDistanceToCeiling = 0.0f;
         for (int i = 0; i < nCeiling; i++) {
-            fDistanceToSky += fStepSize*4;
-            int nTestX = (int)(playerPos.x + fEyeX * fDistanceToSky);
-            int nTestY = (int)(playerPos.y + fEyeY * fDistanceToSky);
+            fDistanceToCeiling += fStepSize*4;
+            int nTestX = (int)(playerPos.x + fEyeX * fDistanceToCeiling);
+            int nTestY = (int)(playerPos.y + fEyeY * fDistanceToCeiling);
             char ceilingBlock = map.c_str()[nTestX * nMapWidth + nTestY];
 
             short tileShade = BRIGHTEST;
