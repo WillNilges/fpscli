@@ -203,7 +203,7 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
             int nTestY = (int)(playerPos.y + fEyeY * fDistanceToSky);
             char skyBlock = map.c_str()[nTestX * nMapWidth + nTestY];
 
-            short tileShade = 0x2588;
+            short tileShade = Graphics::BRIGHTEST;
             
             // This is a dumb formula.
             float b = 1 + (((float)i - Graphics::nScreenHeight / 2.0f) / ((float)Graphics::nScreenHeight / 2.0f));
@@ -244,7 +244,7 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
             int nTestX = (int)(playerPos.x + fEyeX * fDistanceToFloor);
             int nTestY = (int)(playerPos.y + fEyeY * fDistanceToFloor);
             char floorBlock = map.c_str()[nTestX * nMapWidth + nTestY];
-            short tileShade = 0x2588;
+            short tileShade = Graphics::BRIGHTEST;
             
             float b = 1.0f - (((float)i - Graphics::nScreenHeight / 2.0f) / ((float)Graphics::nScreenHeight / 2.0f));
             if (b < 0.25)
@@ -272,7 +272,7 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
                 break;
             default:
                 attron(COLOR_PAIR(3));
-                floorChar[0] = 0x2588;
+                floorChar[0] = Graphics::BRIGHTEST;
                 mvaddwstr(i, x, floorChar);
                 attroff(COLOR_PAIR(3));
                 break;
@@ -308,7 +308,7 @@ void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, 
                 // TODO: Make it not suck as much.
                 char mapBlock = (chtype)map[formula];
                 int color = 1;
-                short character = 0x2588;
+                short character = Graphics::BRIGHTEST;
                 switch (mapBlock) {
                 case 'W':
                     break;

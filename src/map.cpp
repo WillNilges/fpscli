@@ -8,7 +8,7 @@
 
 using namespace BitBorn;
 
-Map::Map(std::string mapFilePath/*, int nMapWidth, int nMapHeight*/) : nMapWidth(nMapWidth), nMapHeight(nMapHeight) {
+Map::Map(std::string mapFilePath) : nMapWidth(nMapWidth), nMapHeight(nMapHeight) {
     std::ifstream mapFile{mapFilePath};
     if (!mapFile) {
         endwin();
