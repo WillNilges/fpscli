@@ -27,7 +27,7 @@ const char KEY_LOOK_LEFT = 'k';
 const char KEY_LOOK_RIGHT = 'l';
 
 int main() {
-    Map map("walls.dat"); // Get the map from a file and instantiate a map object
+    Map map("Map"); // Get the map from a file and instantiate a map object
 
     // Seed the RNG
     srand ( time(NULL) );
@@ -103,7 +103,7 @@ int main() {
         fCoord25D playerPos = player.getPosition();
 
         // Render current frame
-        graphics.renderFrame(playerPos, mapDimensions, mapString, map.getValidWalls());
+        graphics.renderFrame(playerPos, mapDimensions, mapString, map.getValidWalls(), map.getValidIndoors());
 
         // HUD Drawing and ncurses refreshing
         if (showHUD)

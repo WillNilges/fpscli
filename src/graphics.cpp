@@ -21,11 +21,14 @@ Graphics::Graphics(int screenWidth, int screenHeight, float fieldOfView, float d
 
     // Colors!
     start_color();
-    init_pair(WHITE,  COLOR_WHITE,  COLOR_BLACK);  // 'W'
-    init_pair(RED,    COLOR_RED,    COLOR_BLACK);    // 'R'
-    init_pair(GREEN,  COLOR_GREEN,  COLOR_BLACK);  // 'G'
-    init_pair(BLUE,   COLOR_BLUE,   COLOR_BLACK);   // 'B'
-    init_pair(YELLOW, COLOR_YELLOW, COLOR_BLACK); // 'Y'
+    init_pair(BLACK,   COLOR_BLACK,   COLOR_BLACK); // 'B'
+    init_pair(RED,     COLOR_RED,     COLOR_BLACK); // 'R'
+    init_pair(GREEN,   COLOR_GREEN,   COLOR_BLACK); // 'G'
+    init_pair(YELLOW,  COLOR_YELLOW,  COLOR_BLACK); // 'Y'
+    init_pair(BLUE,    COLOR_BLUE,    COLOR_BLACK); // 'B'
+    init_pair(MAGENTA, COLOR_MAGENTA, COLOR_BLACK); // 'M'
+    init_pair(CYAN,    COLOR_CYAN,    COLOR_BLACK); // 'C'
+    init_pair(WHITE,   COLOR_WHITE,   COLOR_BLACK); // 'W'
 
     // The sky
     // init_color(COLOR_MAGENTA, 320, 675, 825);
@@ -38,7 +41,7 @@ Graphics::Graphics(int screenWidth, int screenHeight, float fieldOfView, float d
 
 // Rendering and graphics
 void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions, std::string map,
-                           std::vector<char> validWalls) {
+                           std::vector<char> validWalls, std::vector<char> validIndoors) {
 
     // Measure terminal size
     bool cleared = false;
@@ -222,20 +225,16 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
 
             wchar_t ceilingChar[] = {tileShade, L'\0'};
             
-            switch (ceilingBlock) {
-            case '.':
-                mvaddwstr(i, x, ceilingChar);
-                break;
-            case '*':
+            if (ceilingBlock == '*') {
                 attron(COLOR_PAIR(SPAWN));
                 mvaddwstr(i, x, ceilingChar);
                 attroff(COLOR_PAIR(SPAWN));
-                break;
-            default:
+            } else if (std::find(validIndoors.begin(), validIndoors.end(), ceilingBlock) != validIndoors.end()) {                
+                mvaddwstr(i, x, ceilingChar);
+            } else {
                 attron(COLOR_PAIR(TRUE_SKY));
                 mvaddwstr(i, x, ceilingChar);
                 attroff(COLOR_PAIR(TRUE_SKY));
-                break;
             }
         }
 
@@ -248,37 +247,46 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
             char floorBlock = map.c_str()[nTestX * nMapWidth + nTestY];
             short tileShade = BRIGHTEST;
             
-            float b = 1.0f - (((float)i - nScreenHeight / 2.0f) / ((float)nScreenHeight / 2.0f));
-            if (b < 0.25)
-                tileShade = BRIGHTEST;
-            else if (b < 0.5)
-                tileShade = BRIGHTER;
-            else if (b < 0.75)
-                tileShade = DIM;
-            else if (b < 0.9)
-                tileShade = DARKER;
-            else
-                tileShade = DARKEST;
+            if (std::find(validIndoors.begin(), validIndoors.end(), floorBlock) != validIndoors.end()) {
+                float b = 1.0f - (((float)i - nScreenHeight / 2.0f) / ((float)nScreenHeight / 2.0f));
+                if (b < 0.25)
+                    tileShade = BRIGHTEST;
+                else if (b < 0.5)
+                    tileShade = BRIGHTER;
+                else if (b < 0.75)
+                    tileShade = DIM;
+                else if (b < 0.9)
+                    tileShade = DARKER;
+                else
+                    tileShade = DARKEST;
+            }
 
             wchar_t floorChar[] = {tileShade, L'\0'};
-            switch (floorBlock) {
-            case '.':
-                attron(COLOR_PAIR(BLUE));
-                mvaddwstr(i, x, floorChar);
-                attroff(COLOR_PAIR(BLUE));
-                break;
-            case '*':
+            ColorPallete color = Graphics::determineColor(floorBlock, false);
+            
+            if (floorBlock == '*') {
                 attron(COLOR_PAIR(SPAWN));
                 mvaddwstr(i, x, floorChar);
                 attroff(COLOR_PAIR(SPAWN));
-                break;
-            default:
-                attron(COLOR_PAIR(GREEN));
-                floorChar[0] = BRIGHTEST;
+            } else {
+                attron(COLOR_PAIR(color));
                 mvaddwstr(i, x, floorChar);
-                attroff(COLOR_PAIR(GREEN));
-                break;
+                attroff(COLOR_PAIR(color));
             }
+            
+            // switch (floorBlock) {
+            // case '.':
+            //     break;
+            // case '*':
+                
+            //     break;
+            // default: // Assume we're outside.
+            //     attron(COLOR_PAIR(GREEN));
+            //     floorChar[0] = BRIGHTEST;
+            //     mvaddwstr(i, x, floorChar);
+            //     attroff(COLOR_PAIR(GREEN));
+            //     break;
+            // }
         }
     }
 }
@@ -308,28 +316,31 @@ void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, 
                 // This code sucks.
                 // TODO: Make it not suck as much.
                 char mapBlock = (chtype)map[mapIndex];
-                int color = WHITE;
+                int color = Graphics::determineColor(mapBlock, true);
                 short character = BRIGHTEST;
-                switch (mapBlock) {
-                case 'W':
-                    break;
-                case 'R':
-                    color = RED;
-                    break;
-                case 'G':
-                    color = GREEN;
-                    break;
-                case 'B':
-                    color = BLUE;
-                    break;
-                case 'Y':
-                    color = YELLOW;
-                    break;
-                default:
-                    color = WHITE;
-                    character = ' ';
-                    break;
-                }
+                // switch (mapBlock) {
+                // case 'W':
+                //     break;
+                // case 'R':
+                //     color = RED;
+                //     break;
+                // case 'G':
+                //     color = GREEN;
+                //     break;
+                // case 'B':
+                //     color = BLUE;
+                //     break;
+                // case 'Y':
+                //     color = YELLOW;
+                //     break;
+                // case 'Y':
+                //     color = YELLOW;
+                //     break;
+                // default:
+                //     color = WHITE;
+                //     character = ' ';
+                //     break;
+                // }
                 attron(COLOR_PAIR(color));
                 wchar_t wstr[] = {character, L'\0'};
                 mvaddwstr(ny+1, nx, wstr);
@@ -342,6 +353,38 @@ void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, 
     attron(COLOR_PAIR(RED));
     mvaddch((minimapDimension/2)+1, (minimapDimension/2), 'P');
     attroff(COLOR_PAIR(RED));
+}
+
+Graphics::ColorPallete Graphics::determineColor(char input, bool isWall) {
+    // Handle special cases like spawns
+    if (input == '*')
+        return MAGENTA;
+
+    char block;
+    if (isWall) {
+        block = input;
+    } else {
+        block = input - 32;
+    }
+
+    switch (block) {
+    case 'O':
+        return BLACK;
+    case 'R':
+        return RED;
+    case 'G':
+        return GREEN;
+    case 'Y':
+        return YELLOW;
+    case 'B':
+        return BLUE;
+    case 'M':
+        return MAGENTA;
+    case 'C':
+        return CYAN;
+    default:
+        return WHITE;
+    }
 }
 
 void Graphics::renderControls() {

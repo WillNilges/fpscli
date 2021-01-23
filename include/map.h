@@ -15,6 +15,7 @@ class Map {
     std::string getMap();
     std::array<int, 2> getDimensions();
     std::vector<char> getValidWalls();
+    std::vector<char> getValidIndoors();
     std::vector<nCoord2D> getSpawnLocations();
     fCoord25D getRandomSpawn();
 
@@ -26,7 +27,11 @@ class Map {
     int nMapWidth;
     int nMapHeight;
 
-    std::vector<char> validWalls{'W', 'R', 'G', 'B', 'Y'};
-    std::vector<char> validOpen{'.', ' '};
+// {'O', 'R', 'G', 'Y', 'B', 'M', 'C', 'W'}
+// {'o', 'r', 'g', 'y', 'b', 'm', 'c', 'w'}
+
+    std::vector<char> validWalls;   //{ 'O', 'R', 'G', 'Y', 'B', 'M', 'C', 'W' };
+    std::vector<char> validIndoors; //{ 'o', 'r', 'b', 'm', 'c' };
+    // std::vector<char> validOutdoors { 'g', 'w', 'y' };
 };
 } // namespace BitBorn

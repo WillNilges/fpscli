@@ -6,6 +6,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Find Ncursesw
 find_package( PkgConfig REQUIRED )
 pkg_check_modules(CURSES ncursesw REQUIRED)
+ pkg_check_modules(CONFIG libconfig REQUIRED)
 add_compile_definitions(NCURSES_WIDECHAR)
 
 include_directories( ${CURSES_INCLUDE_DIRS} )
@@ -14,11 +15,12 @@ include_directories( ${CURSES_INCLUDE_DIRS} )
 include_directories( include/ )
 
 # Copy map to build directory
-configure_file(res/walls.dat ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+configure_file(res/walls.dat ${CMAKE_CURRENT_BINARY_DIR}/Map/walls.dat COPYONLY)
+configure_file(res/walls.cfg ${CMAKE_CURRENT_BINARY_DIR}/Map/walls.cfg COPYONLY)
 
 # Add executable target with source files listed in SOURCES variable
 file(GLOB SOURCES src/*.cpp)
 add_executable(BitBorn ${SOURCES})
 
 # Link ncursesw library
-target_link_libraries( BitBorn ${CURSES_LIBRARIES} )
+target_link_libraries( BitBorn ${CURSES_LIBRARIES} config++ )

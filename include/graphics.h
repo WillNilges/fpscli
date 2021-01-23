@@ -11,7 +11,7 @@ class Graphics {
     Graphics(int screenWidth, int screenHeight, float fieldOfView, float depth);
 
     void renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions, std::string map,
-                     std::vector<char> validWalls);
+                     std::vector<char> validWalls, std::vector<char> validIndoors);
     void renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, std::string map, float fElapsedTime);
     void renderControls();
 
@@ -30,6 +30,9 @@ class Graphics {
         GREEN,
         BLUE,
         YELLOW,
+        MAGENTA,
+        CYAN,
+        BLACK,
         SKY,
         TRUE_SKY,
         SPAWN
@@ -44,5 +47,8 @@ class Graphics {
     float fDepth{32.0f};
 
     bool showHUD{false};
+
+    ColorPallete determineColor(char input, bool isWall);
+    
 };
 } // namespace BitBorn
