@@ -14,7 +14,8 @@ Big thanks as well to [rohanliston](https://github.com/rohanliston) for porting 
 
 We're gonna make... something cool with this. I don't know what that thing will be.
 
-![Screenshot](screenshot.png)
+![image](https://user-images.githubusercontent.com/42927786/105610007-f0aa0680-5d7a-11eb-837e-1d5f61f94bd0.png)
+
 ## Prerequisites
 
 * CMake - C/C++ build system
