@@ -25,6 +25,6 @@ class Player {
     fCoord25D position{10.0f, 10.0f, 10.0f};
 
     // Stuff that will probably not change.
-    float fSpeed{150.0f}; // Walking Speed
+    const float fSpeed{25.0f}; // Walking Speed
 };
 }; // namespace BitBorn

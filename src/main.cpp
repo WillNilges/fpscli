@@ -11,8 +11,11 @@
 #include <array>
 #include <vector>
 #include <time.h>
+#include <thread>
 
 using namespace BitBorn;
+
+const std::chrono::duration<int, std::milli> framePeriod = std::chrono::milliseconds(1000 / 30);
 
 bool finished = false;
 bool showHUD = false;
@@ -34,16 +37,15 @@ int main() {
     std::array<int, 2> mapDimensions = map.getDimensions();
     std::string mapString = map.getMap();
 
-    auto tp1 = std::chrono::system_clock::now();
-    auto tp2 = std::chrono::system_clock::now();
+    auto lastFrameStart = std::chrono::steady_clock::now();
 
     while (!finished) {
         // We'll need time differential per frame to calculate modification
         // to movement speeds, to ensure consistant movement, as ray-tracing
         // is non-deterministic
-        tp2 = std::chrono::system_clock::now();
-        std::chrono::duration<float> elapsedTime = tp2 - tp1;
-        tp1 = tp2;
+        auto frameStart = std::chrono::steady_clock::now();
+        std::chrono::duration<float> elapsedTime = frameStart - lastFrameStart;
+        lastFrameStart = frameStart;
         float fElapsedTime = elapsedTime.count();
 
         // Player movement and world collision detection
@@ -104,6 +106,9 @@ int main() {
 
         // Draw screen
         refresh();
+
+        auto frameTime = std::chrono::steady_clock::now() - frameStart;
+        std::this_thread::sleep_for(framePeriod - frameTime);
     }
 
     endwin();
