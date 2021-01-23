@@ -1,11 +1,11 @@
-#include "player.h"
+#include "entity.h"
 #include <algorithm>
 #include <cmath>
 
 using namespace BitBorn;
 
-fCoord25D Player::stageMovement(Action stagedAction, float fElapsedTime) {
-    struct fCoord25D stagedPosition = Player::position;
+fCoord25D Entity::stageMovement(Action stagedAction, float fElapsedTime) {
+    struct fCoord25D stagedPosition = Entity::position;
     switch (stagedAction) {
     case MOVE_FORWARD:
         stagedPosition.x += sinf(stagedPosition.a) * fSpeed * fElapsedTime;
@@ -31,21 +31,21 @@ fCoord25D Player::stageMovement(Action stagedAction, float fElapsedTime) {
     return stagedPosition;
 }
 
-void Player::look(Action stagedAction, float fElapsedTime) {
+void Entity::look(Action stagedAction, float fElapsedTime) {
     switch (stagedAction) {
     case LOOK_LEFT:
         // CCW Rotation
-        Player::position.a -= (fSpeed * 0.75f) * fElapsedTime;
+        Entity::position.a -= (fSpeed * 0.75f) * fElapsedTime;
         break;
     case LOOK_RIGHT:
         // CW Rotation
-        Player::position.a += (fSpeed * 0.75f) * fElapsedTime;
+        Entity::position.a += (fSpeed * 0.75f) * fElapsedTime;
         break;
     default:
         break;
     }
 }
 
-fCoord25D Player::getPosition() { return Player::position; }
+fCoord25D Entity::getPosition() { return Entity::position; }
 
-void Player::setPosition(fCoord25D newPosition) { Player::position = newPosition; }
+void Entity::setPosition(fCoord25D newPosition) { Entity::position = newPosition; }

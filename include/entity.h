@@ -4,14 +4,13 @@
 #include <string>
 #include <vector>
 
-// Player object
 namespace BitBorn {
 
 enum Action { MOVE_FORWARD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, LOOK_LEFT, LOOK_RIGHT };
 
-class Player {
+class Entity {
   public:
-    Player(fCoord25D position) : position(position) {}
+    Entity(fCoord25D position) : position(position) {}
 
     fCoord25D stageMovement(Action stagedAction, float fElapsedTime);
     void look(Action stagedAction, float fElapsedTime);

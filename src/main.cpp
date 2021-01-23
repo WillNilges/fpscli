@@ -1,6 +1,6 @@
 #include "graphics.h"
 #include "map.h"
-#include "player.h"
+#include "entity.h"
 #include "types.h"
 #include "input.h"
 
@@ -26,7 +26,7 @@ int main() {
     fCoord25D currentSpawn = map.getRandomSpawn();
     fCoord25D nextSpawn = currentSpawn;
 
-    Player player(currentSpawn); // Set up the player object
+    Entity player(currentSpawn); // Set up the player object
 
     Graphics graphics(120, 40, (3.14159f / 4.0f), 32.0f); // Initialize graphics
 
