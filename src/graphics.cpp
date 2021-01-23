@@ -304,6 +304,9 @@ void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, 
                 char mapBlock = (chtype)map[mapIndex];
                 int color = Graphics::determineColor(mapBlock, true);
                 short character = BRIGHTEST;
+                if (mapBlock >= 'a') {
+                    character = ' ';
+                }
                 attron(COLOR_PAIR(color));
                 wchar_t wstr[] = {character, L'\0'};
                 mvaddwstr(ny+1, nx, wstr);
