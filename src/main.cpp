@@ -2,6 +2,7 @@
 #include "map.h"
 #include "player.h"
 #include "types.h"
+#include "input.h"
 
 #include <chrono>
 #include <cmath>
@@ -15,16 +16,6 @@ using namespace BitBorn;
 
 bool finished = false;
 bool showHUD = false;
-
-const char KEY_QUIT = 'q';
-const char KEY_SHOW_HUD = 'h';
-const char KEY_RESPAWN = 'p';
-const char KEY_MOVE_FORWARD = 'w';
-const char KEY_MOVE_BACK = 's';
-const char KEY_MOVE_LEFT = 'a';
-const char KEY_MOVE_RIGHT = 'd';
-const char KEY_LOOK_LEFT = 'k';
-const char KEY_LOOK_RIGHT = 'l';
 
 int main() {
     Map map("Map"); // Get the map from a file and instantiate a map object
@@ -56,40 +47,40 @@ int main() {
         float fElapsedTime = elapsedTime.count();
 
         // Player movement and world collision detection
-        int key = getch();
+        Key key = (Key)getch();
         struct fCoord25D proposedMovement = {NAN, NAN, NAN};
         switch (key) {
-        case KEY_QUIT:
+        case Key::QUIT:
             // Quit
             finished = true;
             break;
-        case KEY_SHOW_HUD:
+        case Key::SHOW_HUD:
             // Toggle hud
             showHUD = !showHUD;
             break;
-        case KEY_RESPAWN:
+        case Key::RESPAWN:
             // Don't want the player to re-spawn at their old location.
             while (nextSpawn.x == currentSpawn.x && nextSpawn.y == currentSpawn.y)
                 nextSpawn = map.getRandomSpawn();
             player.setPosition(nextSpawn);
             currentSpawn = nextSpawn;
             break;
-        case KEY_MOVE_FORWARD:
+        case Key::MOVE_FORWARD:
             proposedMovement = player.stageMovement(MOVE_FORWARD, fElapsedTime);
             break;
-        case KEY_MOVE_BACK:
+        case Key::MOVE_BACK:
             proposedMovement = player.stageMovement(MOVE_BACK, fElapsedTime);
             break;
-        case KEY_MOVE_LEFT:
+        case Key::MOVE_LEFT:
             proposedMovement = player.stageMovement(MOVE_LEFT, fElapsedTime);
             break;
-        case KEY_MOVE_RIGHT:
+        case Key::MOVE_RIGHT:
             proposedMovement = player.stageMovement(MOVE_RIGHT, fElapsedTime);
             break;
-        case KEY_LOOK_LEFT:
+        case Key::LOOK_LEFT:
             player.look(LOOK_LEFT, fElapsedTime);
             break;
-        case KEY_LOOK_RIGHT:
+        case Key::LOOK_RIGHT:
             player.look(LOOK_RIGHT, fElapsedTime);
             break;
         }
