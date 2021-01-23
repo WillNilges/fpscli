@@ -27,11 +27,7 @@ class Map {
     int nMapWidth;
     int nMapHeight;
 
-// {'O', 'R', 'G', 'Y', 'B', 'M', 'C', 'W'}
-// {'o', 'r', 'g', 'y', 'b', 'm', 'c', 'w'}
-
-    std::vector<char> validWalls;   //{ 'O', 'R', 'G', 'Y', 'B', 'M', 'C', 'W' };
-    std::vector<char> validIndoors; //{ 'o', 'r', 'b', 'm', 'c' };
-    // std::vector<char> validOutdoors { 'g', 'w', 'y' };
+    std::vector<char> validWalls;   
+    std::vector<char> validIndoors;
 };
 } // namespace BitBorn
