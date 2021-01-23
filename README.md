@@ -24,7 +24,7 @@ We're gonna make... something cool with this. I don't know what that thing will 
 
 ### Installation
 
-* Ubuntu: `sudo apt-get install cmake libncursesw5-dev libconfig-dev`
+* Ubuntu: `sudo apt-get install cmake libncursesw5-dev libconfig++-dev`
 * Fedora: `sudo dnf -y install cmake ncurses-devel libconfig-devel`
 * Other distros: `¯\_(ツ)_/¯`
 
