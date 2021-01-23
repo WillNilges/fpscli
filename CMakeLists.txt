@@ -25,3 +25,8 @@ add_executable(BitBorn ${SOURCES})
 
 # Link ncursesw library
 target_link_libraries( BitBorn ${CURSES_LIBRARIES} ${CONFIG_LIBRARIES} )
+
+set(CMAKE_INSTALL_DATAROOTDIR share/bitborn)
+
+install(TARGETS BitBorn)
+install(DIRECTORY res/ TYPE DATA)
