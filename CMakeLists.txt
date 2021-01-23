@@ -6,10 +6,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Find Ncursesw
 find_package( PkgConfig REQUIRED )
 pkg_check_modules(CURSES ncursesw REQUIRED)
- pkg_check_modules(CONFIG libconfig REQUIRED)
+pkg_check_modules(CONFIG libconfig++ REQUIRED)
 add_compile_definitions(NCURSES_WIDECHAR)
 
 include_directories( ${CURSES_INCLUDE_DIRS} )
+include_directories( ${CONFIG_INCLUDE_DIRS} )
 
 # Add project include/ directory
 include_directories( include/ )
@@ -23,4 +24,4 @@ file(GLOB SOURCES src/*.cpp)
 add_executable(BitBorn ${SOURCES})
 
 # Link ncursesw library
-target_link_libraries( BitBorn ${CURSES_LIBRARIES} config++ )
+target_link_libraries( BitBorn ${CURSES_LIBRARIES} ${CONFIG_LIBRARIES} )

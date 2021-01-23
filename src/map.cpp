@@ -17,7 +17,6 @@ Map::Map(std::string mapDirPath) : nMapWidth(nMapWidth), nMapHeight(nMapHeight) 
 
     std::string config = "walls.cfg";
     std::string walls = "walls.dat";
-    
 
     const char* cfgPath   = (mapDirPath + "/" + config).c_str();
     const char* wallsPath = (mapDirPath + "/" + walls).c_str();
@@ -35,15 +34,15 @@ Map::Map(std::string mapDirPath) : nMapWidth(nMapWidth), nMapHeight(nMapHeight) 
     }
 
     // Grab tile data from the config files
-    std::cout << "Looking up root";
+    std::cout << "Looking up root" << "\n";
     const libconfig::Setting& root = cfg.getRoot();
-    std::cout << "Looking up valid walls";
+    std::cout << "Looking up valid walls" << "\n";
     const libconfig::Setting &configValidWalls = root.lookup("valid_walls");
     for (int i = 0; i < configValidWalls.getLength(); ++i) {
         validWalls.push_back(configValidWalls[i].c_str()[0]);
     }
     
-    std::cout << "Looking up valid indoors";
+    std::cout << "Looking up valid indoors" << "\n";
     const libconfig::Setting &configValidIndoors = root.lookup("valid_indoors");
     for (int i = 0; i < configValidIndoors.getLength(); ++i) {
         validIndoors.push_back(configValidIndoors[i].c_str()[0]);

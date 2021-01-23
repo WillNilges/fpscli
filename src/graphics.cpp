@@ -273,20 +273,6 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
                 mvaddwstr(i, x, floorChar);
                 attroff(COLOR_PAIR(color));
             }
-            
-            // switch (floorBlock) {
-            // case '.':
-            //     break;
-            // case '*':
-                
-            //     break;
-            // default: // Assume we're outside.
-            //     attron(COLOR_PAIR(GREEN));
-            //     floorChar[0] = BRIGHTEST;
-            //     mvaddwstr(i, x, floorChar);
-            //     attroff(COLOR_PAIR(GREEN));
-            //     break;
-            // }
         }
     }
 }
@@ -318,29 +304,6 @@ void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, 
                 char mapBlock = (chtype)map[mapIndex];
                 int color = Graphics::determineColor(mapBlock, true);
                 short character = BRIGHTEST;
-                // switch (mapBlock) {
-                // case 'W':
-                //     break;
-                // case 'R':
-                //     color = RED;
-                //     break;
-                // case 'G':
-                //     color = GREEN;
-                //     break;
-                // case 'B':
-                //     color = BLUE;
-                //     break;
-                // case 'Y':
-                //     color = YELLOW;
-                //     break;
-                // case 'Y':
-                //     color = YELLOW;
-                //     break;
-                // default:
-                //     color = WHITE;
-                //     character = ' ';
-                //     break;
-                // }
                 attron(COLOR_PAIR(color));
                 wchar_t wstr[] = {character, L'\0'};
                 mvaddwstr(ny+1, nx, wstr);
