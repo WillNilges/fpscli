@@ -21,7 +21,13 @@ bool finished = false;
 bool showHUD = false;
 
 int main() {
-    Map map("Map"); // Get the map from a file and instantiate a map object
+    std::string datadir = "./";
+
+    char *cDatadir = std::getenv("BITBORN_DATADIR");
+    if (cDatadir != nullptr) {
+        datadir = std::string(cDatadir);
+    }
+    Map map(datadir + "/map"); // Get the map from a file and instantiate a map object
 
     // Seed the RNG
     srand ( time(NULL) );

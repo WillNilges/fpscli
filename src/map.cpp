@@ -18,12 +18,12 @@ Map::Map(std::string mapDirPath) : nMapWidth(nMapWidth), nMapHeight(nMapHeight) 
     std::string config = "walls.cfg";
     std::string walls = "walls.dat";
 
-    const char* cfgPath   = (mapDirPath + "/" + config).c_str();
-    const char* wallsPath = (mapDirPath + "/" + walls).c_str();
+    std::string cfgPath   = mapDirPath + "/" + config;
+    std::string wallsPath = mapDirPath + "/" + walls;
 
     try {
         std::cout << cfgPath << "\n";
-        cfg.readFile(cfgPath);
+        cfg.readFile(cfgPath.c_str());
     }
     catch(const libconfig::FileIOException &fioex) {
         std::cerr << "I/O error while reading file." << std::endl;
