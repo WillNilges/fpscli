@@ -20,11 +20,12 @@ We're gonna make... something cool with this. I don't know what that thing will 
 
 * CMake - C/C++ build system
 * NCursesw - Library for interacting with the terminal
+* Libconfig - Library for using config files
 
 ### Installation
 
-* Ubuntu: `sudo apt-get install cmake libncursesw5-dev`
-* Fedora: `sudo dnf -y install cmake ncurses-devel`
+* Ubuntu: `sudo apt-get install cmake libncursesw5-dev libconfig-dev`
+* Fedora: `sudo dnf -y install cmake ncurses-devel libconfig-devel`
 * Other distros: `¯\_(ツ)_/¯`
 
 ## Build
