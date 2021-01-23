@@ -1,17 +1,17 @@
 #include "graphics.h"
+#include "input.h"
 #include "map.h"
 #include "player.h"
 #include "types.h"
-#include "input.h"
 
+#include <array>
 #include <chrono>
 #include <cmath>
 #include <iostream>
 #include <ncurses.h>
-#include <array>
-#include <vector>
-#include <time.h>
 #include <thread>
+#include <time.h>
+#include <vector>
 
 using namespace BitBorn;
 
@@ -30,7 +30,7 @@ int main() {
     Map map(datadir + "/map"); // Get the map from a file and instantiate a map object
 
     // Seed the RNG
-    srand ( time(NULL) );
+    srand(time(NULL));
 
     fCoord25D currentSpawn = map.getRandomSpawn();
     fCoord25D nextSpawn = currentSpawn;
