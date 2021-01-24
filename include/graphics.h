@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+#include "entity.h"
 #include <array>
 #include <string>
 #include <vector>
@@ -10,9 +11,12 @@ class Graphics {
   public:
     Graphics(int screenWidth, int screenHeight, float fieldOfView, float depth);
 
-    void renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions, std::string map,
+    void renderFrame(fCoord25D playerPos, std::vector<Entity> entities, std::array<int, 2> mapDimensions, std::string map,
                      std::vector<char> validWalls, std::vector<char> validIndoors);
     void renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, std::string map, float fElapsedTime);
+    
+    void renderPlayerStatus(int currentHealth, int maxHealth);
+
     void renderControls();
 
     ~Graphics();
@@ -35,7 +39,9 @@ class Graphics {
         BLACK,
         SKY,
         TRUE_SKY,
-        SPAWN
+        SPAWN,
+        HUD,
+        HUD_INV
     };
 
     int terminalWidth;

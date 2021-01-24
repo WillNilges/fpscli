@@ -37,10 +37,14 @@ Graphics::Graphics(int screenWidth, int screenHeight, float fieldOfView, float d
 
     // Other things
     init_pair(SPAWN,    COLOR_MAGENTA, COLOR_MAGENTA);
+
+    // For the HUD
+    init_pair(HUD,      COLOR_BLACK,     COLOR_RED);
+    init_pair(HUD_INV,  COLOR_RED,       COLOR_BLACK);
 }
 
 // Rendering and graphics
-void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions, std::string map,
+void Graphics::renderFrame(fCoord25D playerPos, std::vector<Entity> entities, std::array<int, 2> mapDimensions, std::string map,
                            std::vector<char> validWalls, std::vector<char> validIndoors) {
 
     // Measure terminal size
@@ -274,6 +278,87 @@ void Graphics::renderFrame(fCoord25D playerPos, std::array<int, 2> mapDimensions
                 attroff(COLOR_PAIR(color));
             }
         }
+
+        float fDistanceToEntity = 0.0f;
+        bool bHitEntity = false;
+
+        std::string shitSprite;
+        shitSprite += "....................";//"       ....         ";
+        shitSprite += "....................";//"       ....         ";
+        shitSprite += "....................";//"       ....         ";
+        shitSprite += "....................";//"        .           ";
+        shitSprite += "....................";//"   .............    ";
+        shitSprite += "....................";//"        .           ";
+        shitSprite += "....................";//"        .           ";
+        shitSprite += "....................";//"        .           ";
+        shitSprite += "....................";//"       .  .         ";
+        shitSprite += "....................";//"      .    .        ";
+        shitSprite += "....................";//"     .      .       ";
+        shitSprite += "....................";//"    .        .      ";
+        
+        while (!bHitEntity && fDistanceToEntity < fDepth) {
+            fDistanceToEntity += fStepSize*4;
+            float fTestX = (int)(playerPos.x + fEyeX * fDistanceToEntity);
+            float fTestY = (int)(playerPos.y + fEyeY * fDistanceToEntity);
+            wallBlock = map.c_str()[(int) round(fTestX * nMapWidth + fTestY)];
+            if (std::find(validWalls.begin(), validWalls.end(), wallBlock) != validWalls.end())
+                break;
+            
+            for (auto & entity : entities) {
+                fCoord25D position = entity.getPosition();
+                float fEntityScale = 0.01;
+                if ( position.x - fEntityScale < fTestX && fTestX < position.x + fEntityScale && position.y - fEntityScale < fTestY && fTestY < position.y + fEntityScale) {
+                    bHitEntity = true;
+                    int nEntCeiling =
+                        (int)((float)(nScreenHeight / 2.0) - nScreenHeight / ((float)fDistanceToEntity));
+                    int nEntFloor = nScreenHeight - nEntCeiling;
+                    for (int y = 0; y < nScreenHeight; y++) {
+                        if (y > nEntCeiling && y <= nEntFloor) {
+                        ColorPallete color = BLUE;
+                        if (y % 2 == 0 && x % 2 == 0) {
+                            color = BLACK;
+                        }
+                        attron(COLOR_PAIR(color));
+                        wchar_t wstr[] = {BRIGHTEST, L'\0'};
+                        mvaddwstr(y, x, wstr);
+                        attroff(COLOR_PAIR(color));
+                        }   
+                    }
+                }
+            }
+        }
+    }
+}
+
+Graphics::ColorPallete Graphics::determineColor(char input, bool isWall) {
+    // Handle special cases like spawns
+    if (input == '*')
+        return MAGENTA;
+
+    char block;
+    if (isWall) {
+        block = input;
+    } else {
+        block = input - 32;
+    }
+
+    switch (block) {
+    case 'O':
+        return BLACK;
+    case 'R':
+        return RED;
+    case 'G':
+        return GREEN;
+    case 'Y':
+        return YELLOW;
+    case 'B':
+        return BLUE;
+    case 'M':
+        return MAGENTA;
+    case 'C':
+        return CYAN;
+    default:
+        return WHITE;
     }
 }
 
@@ -318,36 +403,36 @@ void Graphics::renderHUD(fCoord25D playerPos, std::array<int, 2> mapDimensions, 
     attroff(COLOR_PAIR(RED));
 }
 
-Graphics::ColorPallete Graphics::determineColor(char input, bool isWall) {
-    // Handle special cases like spawns
-    if (input == '*')
-        return MAGENTA;
+void Graphics::renderPlayerStatus(int currentHealth, int maxHealth) {
+    int barWidth = nScreenWidth/4;
+    int scaledMaxHP = barWidth * maxHealth / maxHealth;
+    int scaledCurrentHP = barWidth * currentHealth / maxHealth;
+    attron(COLOR_PAIR(HUD));
+    
+    // Render health
+    int healthBarPosY = nScreenHeight * 0.94;
+    int healthBarPosX = nScreenWidth * 0.03;
+    move(healthBarPosY, healthBarPosX);
+    attron(A_BOLD);
+    addstr("HP: [");
 
-    char block;
-    if (isWall) {
-        block = input;
-    } else {
-        block = input - 32;
+    // Print the bar
+    attron(COLOR_PAIR(HUD_INV));
+    for (int i = 0; i < scaledCurrentHP; i++) {
+        wchar_t wstr[] = {BRIGHTEST, L'\0'};
+        mvaddwstr(healthBarPosY, healthBarPosX + 5 + i, wstr);
     }
+    for (int i = scaledCurrentHP; i < scaledMaxHP; i++) {
+        wchar_t wstr[] = {DIM, L'\0'};
+        mvaddwstr(healthBarPosY, healthBarPosX + 5 + i, wstr);
+    }
+    attroff(COLOR_PAIR(HUD_INV));
 
-    switch (block) {
-    case 'O':
-        return BLACK;
-    case 'R':
-        return RED;
-    case 'G':
-        return GREEN;
-    case 'Y':
-        return YELLOW;
-    case 'B':
-        return BLUE;
-    case 'M':
-        return MAGENTA;
-    case 'C':
-        return CYAN;
-    default:
-        return WHITE;
-    }
+    attron(COLOR_PAIR(HUD));
+    mvaddch(healthBarPosY, healthBarPosX + scaledMaxHP + 5, ']');
+    attroff(A_BOLD);
+
+    attroff(COLOR_PAIR(HUD));
 }
 
 void Graphics::renderControls() {

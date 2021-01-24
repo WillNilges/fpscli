@@ -26,7 +26,13 @@ int main() {
     fCoord25D currentSpawn = map.getRandomSpawn();
     fCoord25D nextSpawn = currentSpawn;
 
-    Entity player(currentSpawn); // Set up the player object
+    Entity player(true, currentSpawn); // Set up the player object
+
+    std::vector<Entity> vecEntities;
+
+    vecEntities.push_back(Entity(false, {6,6,0}));
+    vecEntities.push_back(Entity(false, {10,6,0}));
+    vecEntities.push_back(Entity(false, {9,4,0}));
 
     Graphics graphics(120, 40, (3.14159f / 4.0f), 32.0f); // Initialize graphics
 
@@ -83,6 +89,12 @@ int main() {
         case Key::LOOK_RIGHT:
             player.look(LOOK_RIGHT, fElapsedTime);
             break;
+        case Key::DBG_HEAL:
+            player.heal(5);
+            break;
+        case Key::DBG_HARM:
+            player.harm(5);
+            break;
         }
 
         if (!std::isnan(proposedMovement.x) || !std::isnan(proposedMovement.y) || !std::isnan(proposedMovement.a)) {
@@ -91,14 +103,31 @@ int main() {
                 player.setPosition(proposedMovement);
         }
 
+        // Check if we need to respawn the player
+        // TODO: Prioritize high level functions. Do we draw the frame after we check that they're dead, or before?
+
+        if (player.isDead()) {
+            // Love to duplicate code
+            // Don't want the player to re-spawn at their old location.
+            while (nextSpawn.x == currentSpawn.x && nextSpawn.y == currentSpawn.y)
+                nextSpawn = map.getRandomSpawn();
+            player.setPosition(nextSpawn);
+            currentSpawn = nextSpawn;
+            player.heal(player.getMaxHealth());
+        }
+
+        // Graphics n' shit like that
+
         fCoord25D playerPos = player.getPosition();
 
         // Render current frame
-        graphics.renderFrame(playerPos, mapDimensions, mapString, map.getValidWalls(), map.getValidIndoors());
+        graphics.renderFrame(playerPos, vecEntities, mapDimensions, mapString, map.getValidWalls(), map.getValidIndoors());
 
         // HUD Drawing and ncurses refreshing
         if (showHUD)
             graphics.renderHUD(playerPos, mapDimensions, mapString, fElapsedTime);
+
+        graphics.renderPlayerStatus(player.getCurrentHealth(), player.getMaxHealth());
 
         graphics.renderControls();
 

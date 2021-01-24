@@ -10,4 +10,6 @@ enum class Key : char {
     MOVE_RIGHT = 'd',
     LOOK_LEFT = 'k',
     LOOK_RIGHT = 'l',
+    DBG_HEAL = 'i',
+    DBG_HARM = 'o'
 };
