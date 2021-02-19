@@ -30,9 +30,9 @@ int main() {
 
     std::vector<Entity> vecEntities;
 
-    vecEntities.push_back(Entity(false, {6,6,0}));
-    vecEntities.push_back(Entity(false, {10,6,0}));
-    vecEntities.push_back(Entity(false, {9,4,0}));
+    vecEntities.push_back(Entity(false, {6.5,6.5,0}));
+    vecEntities.push_back(Entity(false, {10.3,6,0}));
+    vecEntities.push_back(Entity(false, {9.3,4,0}));
 
     Graphics graphics(120, 40, (3.14159f / 4.0f), 32.0f); // Initialize graphics
 

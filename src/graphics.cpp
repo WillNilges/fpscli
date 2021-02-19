@@ -279,6 +279,7 @@ void Graphics::renderFrame(fCoord25D playerPos, std::vector<Entity> entities, st
             }
         }
 
+        // Paint any entities which might exist in this space.
         float fDistanceToEntity = 0.0f;
         bool bHitEntity = false;
 
@@ -298,31 +299,36 @@ void Graphics::renderFrame(fCoord25D playerPos, std::vector<Entity> entities, st
         
         while (!bHitEntity && fDistanceToEntity < fDepth) {
             fDistanceToEntity += fStepSize*4;
-            float fTestX = (int)(playerPos.x + fEyeX * fDistanceToEntity);
-            float fTestY = (int)(playerPos.y + fEyeY * fDistanceToEntity);
+            float fTestX = floor(playerPos.x + fEyeX * fDistanceToEntity);
+            float fTestY = floor(playerPos.y + fEyeY * fDistanceToEntity);
+            // float fTestX = playerPos.x + fEyeX * fDistanceToEntity;
+            // float fTestY = playerPos.y + fEyeY * fDistanceToEntity;
             wallBlock = map.c_str()[(int) round(fTestX * nMapWidth + fTestY)];
+
+            // Don't render an entity if the ray is interrupted by a wall
             if (std::find(validWalls.begin(), validWalls.end(), wallBlock) != validWalls.end())
                 break;
-            
+
             for (auto & entity : entities) {
                 fCoord25D position = entity.getPosition();
-                float fEntityScale = 0.01;
-                if ( position.x - fEntityScale < fTestX && fTestX < position.x + fEntityScale && position.y - fEntityScale < fTestY && fTestY < position.y + fEntityScale) {
+
+                // If the ray hits the coordinate of the entity, render it.
+                // float thresh = 0.0f;
+                // bool isX = fTestX - thresh < floor(position.x) && floor(position.x) < fTestX + thresh;  
+                // bool isY = fTestY - thresh < floor(position.y) && floor(position.y) < fTestY + thresh;
+                // if (isX && isY) {
+                if (floor(position.x) == fTestX && floor(position.y) == fTestY) {
                     bHitEntity = true;
-                    int nEntCeiling =
-                        (int)((float)(nScreenHeight / 2.0) - nScreenHeight / ((float)fDistanceToEntity));
+                    int nEntCeiling = (int)((float)(nScreenHeight / 2.0) - nScreenHeight / ((float)fDistanceToEntity));
                     int nEntFloor = nScreenHeight - nEntCeiling;
                     for (int y = 0; y < nScreenHeight; y++) {
                         if (y > nEntCeiling && y <= nEntFloor) {
-                        ColorPallete color = BLUE;
-                        if (y % 2 == 0 && x % 2 == 0) {
-                            color = BLACK;
+                            ColorPallete color = BLUE;
+                            attron(COLOR_PAIR(color));
+                            wchar_t wstr[] = {BRIGHTEST, L'\0'};
+                            mvaddwstr(y, x, wstr);
+                            attroff(COLOR_PAIR(color));
                         }
-                        attron(COLOR_PAIR(color));
-                        wchar_t wstr[] = {BRIGHTEST, L'\0'};
-                        mvaddwstr(y, x, wstr);
-                        attroff(COLOR_PAIR(color));
-                        }   
                     }
                 }
             }
